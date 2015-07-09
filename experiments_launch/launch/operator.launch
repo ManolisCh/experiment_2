@@ -1,0 +1,38 @@
+<launch>
+
+
+<!-- joy node -->
+  <node respawn="true" pkg="joy" type="joy_node" name="joy_node" >
+    <param name="dev" type="string" value="/dev/input/js0" />
+    <param name="deadzone" value="0.15" />
+  </node>
+
+
+<!-- teleop node -->
+<node pkg="mixed_initiative_teleop" type="mixed_initiative_teleop" name="mi_teleop" output="screen"/>
+
+
+<!-- cmd mixer for choosing autonomy mode -->
+<!-- In xbox controller Y =  teleop , A = auto , B = stop (in any case) -->
+<node pkg="mixed_initiative_controller" type="mixed_initiative_controller" name="mi_controller" output="screen"/>>
+
+
+<!-- Hector trajectory serve
+r for keeping history and visualizing of all the paths visited -->
+<node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server" output="screen"/>
+
+
+<!-- mode and status visualising node -->
+<node pkg="status_publisher" type="status_publisher" name="status_publisher" output="screen"/>
+
+<!-- RVIZ Interface -->
+<node pkg="rviz" type="rviz" name="rviz" 
+  args="-d $(find experiments_launch)/rviz_cfg/rviz_cfg.rviz"/>
+
+<!-- Robot Model -->
+<include file="$(find p2os_urdf)/launch/pioneer3dx_urdf.launch"/>
+
+
+
+
+</launch>

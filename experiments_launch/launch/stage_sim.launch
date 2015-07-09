@@ -1,0 +1,109 @@
+<launch>
+
+<!-- tell to roscore that we will run in simulation-->
+<param name="/use_sim_time" value="true"/>
+
+<!-- start stage simulator -->
+<node pkg="stage_ros" type="stageros" name="stageros" args="$(find experiments_launch)/world/stage_pioneer.world" >
+<remap from="/base_scan" to="/scan" />
+</node>
+
+<!-- Laser noise node to add some extra noise-->
+  <node respawn="true" pkg="laser_noise" type="laser_noise_node" name="laser_noise" > 
+       <remap from="/scan_with_noise" to="/scan_final" />
+  </node>
+
+<!-- joy node for aka joystick drivers-->
+  <node respawn="true" pkg="joy" type="joy_node" name="joy_node" >
+    <param name="dev" type="string" value="/dev/input/js1" /> <!-- change this /jsX depending on your joystick port -->
+    <param name="deadzone" value="0.15" />
+  </node> 
+
+<!-- teleop node -->
+<node pkg="mixed_initiative_teleop" type="mixed_initiative_teleop" name="mi_teleop" output="screen"/>
+
+<!-- cmd mixer for choosing autonomy mode or e.g. emergency stop if nav doesnt work good. (buttons for teleoperation - stop - autonomy mode) -->
+<!-- In xbox controller Y =  teleop , A = auto , B = stop (in any case) -->
+<node pkg="mixed_initiative_controller" type="mixed_initiative_controller" name="mi_controller" output="screen"/>
+
+
+<!-- Gmapping SLAM -->
+<include file="$(find experiments_launch)/launch/slam_gmapping.launch"/>
+
+<!-- Hector SLAM -->
+<!--include file="$(find experiments_launch)/launch/hector_slam.launch"/-->
+
+<!-- Navigation stuff / move_base -->
+<include file="$(find experiments_launch)/launch/move_base.launch"/>
+
+<!-- Frontier exploration -->
+<!--include file="$(find experiments_launch)/launch/frontier_exploration.launch"/-->
+
+<!-- secondary workload task-->
+<node pkg="pub_stimulus" type="pub_stimulus" name="pub_stimulus" output="screen">
+<param name="target_pub_period"  value="4"/>
+<param name="var_pub_period"  value="4"/>
+</node>
+
+<node pkg="pub_stimulus" type="workload_rt" name="workload_rt" output="screen"/>
+
+<!-- mode and status visualising node -->
+<node pkg="status_publisher" type="status_publisher" name="status_publisher" output="screen"/>
+
+<node pkg="rviz" type="rviz" name="rviz" 
+    args="-d $(find experiments_launch)/rviz_cfg/rviz_cfg.rviz"/>
+
+
+<!-- MAP server to load the predefined map -->
+  <arg name="map_file" default="$(find experiments_launch)/world/lgfloor.yaml" />
+
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" >
+    <remap from="/map" to="/mapAMCL" />
+  </node>
+
+<node pkg="amcl" type="amcl" name="amcl" respawn="true">
+   <!--<remap from="scan" to="scan_filtered" /> -->
+
+  <!-- Set initial position -->
+  <param name="initial_pose_x" value="0"/>
+  <param name="initial_pose_y" value="0"/>
+
+  <!-- General parameters -->
+  <param name="min_particles" value="500"/>
+  <param name="max_particles" value="5000"/>
+  <param name="kld_err" value="0.01"/>
+  <param name="kld_z" value="0.99"/>
+  <param name="update_min_d" value="0.15"/>
+  <param name="update_min_a" value="0.3"/>
+  <param name="resample_interval" value="2"/>
+  <param name="transform_tolerance" value="0.1" />
+  <param name="recovery_alpha_slow" value="0.0"/>
+  <param name="recovery_alpha_fast" value="0.0"/>
+  <param name="gui_publish_rate" value="-1.0"/>
+
+
+  <!-- Odometry model parameters -->
+  <param name="odom_frame_id" value="odom"/>
+  <param name="base_frame_id" value="base_link"/>
+  <param name="global_frame_id" value="map"/>
+  <param name="odom_model_type" value="diff"/>
+  <param name="odom_alpha1" value="0.35"/>
+  <param name="odom_alpha2" value="0.35"/>
+  <param name="odom_alpha3" value="0.35"/>
+  <param name="odom_alpha4" value="0.35"/>
+ 
+
+  <!-- Laser model parameters -->
+  <!--param name="laser_z_hit" value="0.5"/>
+  <param name="laser_z_short" value="0.05"/>
+  <param name="laser_z_max" value="0.05"/>
+  <param name="laser_z_rand" value="0.5"/>
+  <param name="laser_sigma_hit" value="0.2"/>
+  <param name="laser_lambda_short" value="0.1"/>
+  <param name="laser_lambda_short" value="0.1"/>
+  <param name="laser_likelihood_max_dist" value="2.0"/>
+  <param name="laser_max_beams" value="30"/>
+  <param name="laser_model_type" value="likelihood_field"/-->
+ </node> 
+
+</launch>
