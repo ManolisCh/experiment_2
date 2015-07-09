@@ -1,0 +1,18 @@
+<launch>
+
+<!--param name="/move_base/conservative_reset/reset_distance" type="double" value="15"/>
+<param name="/move_base/conservative_reset_dist" type="double" value="15"/-->
+
+<node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen">
+     <remap from="/cmd_vel" to="/navigation/cmd_vel" />
+    <!--param name="NavfnROS/default_tolerance" value="0"/-->
+    <rosparam file="$(find experiments_launch)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find experiments_launch)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find experiments_launch)/config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find experiments_launch)/config/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find experiments_launch)/config/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find experiments_launch)/config/navfn_params.yaml" command="load" />
+    <param name="controller_frequency" type="double" value="15.0"/>
+ </node>
+
+</launch>

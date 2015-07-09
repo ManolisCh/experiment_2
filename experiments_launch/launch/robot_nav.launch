@@ -35,11 +35,18 @@
 <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="0.20 0 0.20 0 0 0 /base_link /base_laser 25" />
 
 
+<!-- MAP server to load the predefined map -->
+  <arg name="map_file" default="$(find experiments_launch)/world/map.yaml" />
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" >
+  <remap from="/map" to="/mapAmcl" />
+  </node>
+
 <!-- Gmapping SLAM -->
 <include file="$(find experiments_launch)/launch/slam_gmapping.launch"/>
 
-<!-- Navigation stuff / move_base -->
+<!-- Navigation stuff / move_base, AMCL etc -->
 <include file="$(find experiments_launch)/launch/move_base.launch"/>
+<include file="$(find experiments_launch)/launch/amcl.launch"/>
 
 <!-- usb_cam -->
 <include file="$(find experiments_launch)/launch/usb_cam.launch"/>
