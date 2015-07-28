@@ -2,14 +2,14 @@
 
    <!-- AMCL node -->
    <node pkg="amcl" type="amcl" name="amcl" respawn="true">
-   <remap from="scan" to="scan_filtered" />
+   <remap from="scan" to="scan_final" />
 
   <!-- Set initial position -->
-   <!-- <param name="initial_pose_x" value="0"/>
-  <param name="initial_pose_y" value="0"/>
+  <!--param name="initial_pose_x" value="0"/>
+  <param name="initial_pose_y" value="0"/-->
 
   <!-- General parameters -->
-  <!-- <param name="min_particles" value="500"/>
+  <param name="min_particles" value="500"/>
   <param name="max_particles" value="5000"/>
   <param name="kld_err" value="0.01"/>
   <param name="kld_z" value="0.99"/>
@@ -25,7 +25,7 @@
 
 
   <!-- Odometry model parameters -->
-  <!--<param name="odom_frame_id" value="odom"/>
+  <param name="odom_frame_id" value="odom"/>
   <param name="base_frame_id" value="base_link"/>
   <param name="global_frame_id" value="map"/>
   <param name="odom_model_type" value="diff"/>
@@ -36,7 +36,7 @@
  
 
   <!-- Laser model parameters -->
-  <!--param name="laser_z_hit" value="0.5"/>
+  <param name="laser_z_hit" value="0.5"/>
   <param name="laser_z_short" value="0.05"/>
   <param name="laser_z_max" value="0.05"/>
   <param name="laser_z_rand" value="0.5"/>
@@ -45,7 +45,7 @@
   <param name="laser_lambda_short" value="0.1"/>
   <param name="laser_likelihood_max_dist" value="2.0"/>
   <param name="laser_max_beams" value="30"/>
-  <param name="laser_model_type" value="likelihood_field"/-->
- <!--/node--> 
+  <param name="laser_model_type" value="likelihood_field"/>
+  </node> 
 
 </launch>
