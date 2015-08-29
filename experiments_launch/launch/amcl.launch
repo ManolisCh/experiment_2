@@ -5,8 +5,9 @@
    <remap from="scan" to="scan_final" />
 
   <!-- Set initial position -->
-  <!--param name="initial_pose_x" value="0"/>
-  <param name="initial_pose_y" value="0"/-->
+  <param name="initial_pose_x" value="1.5"/>
+  <param name="initial_pose_y" value="3.2"/>
+  
 
   <!-- General parameters -->
   <param name="min_particles" value="500"/>
