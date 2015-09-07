@@ -19,7 +19,10 @@ public:
         pose_sub_ = n_.subscribe<geometry_msgs::PoseWithCovarianceStamped>("amcl_pose", 50, &LaserNoise::poseCallback, this);
 
         scan_pub_ = n_.advertise<sensor_msgs::LaserScan>("scan_with_noise", 50);
-        noiseTriger_ = 0;
+
+        timerNoise_ = n_.createTimer(ros::Duration(10) , &LaserNoise::timerNoiseCallback, this, true, false);
+
+        areaTriger_ = 0, timerTriger_ =0, timerActivated_= 0 ;
     }
 
 private:
@@ -30,12 +33,14 @@ private:
     ros::Subscriber laser_sub_ , pose_sub_;
     ros::Publisher scan_pub_ ;
     sensor_msgs::LaserScan addedNoiseScan_;
+    ros::Timer timerNoise_ ;
 
     void laserReadCallBAck(const sensor_msgs::LaserScan::ConstPtr& msg);
     double GaussianKernel(double mu,double sigma), uniformNoise_;
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
+    void timerNoiseCallback(const ros::TimerEvent&);
 
-    bool noiseTriger_ ; // uniformTriger_;
+    bool areaTriger_ , timerTriger_, timerActivated_; // uniformTriger_;
 };
 
 
@@ -50,7 +55,7 @@ void LaserNoise::laserReadCallBAck(const sensor_msgs::LaserScan::ConstPtr& msg)
 
 
     // Guassian noise added
-    if (noiseTriger_ == 1)
+    if (areaTriger_ == 1 && timerTriger_ == 0)
     {
         for (int i=0; i < addedNoiseScan_.ranges.size() ; i++)
 
@@ -79,17 +84,36 @@ void LaserNoise::poseCallback(const geometry_msgs::PoseWithCovarianceStamped::Co
 
 {
 
-  if ( (msg->pose.pose.position.x < 3.5) && (msg->pose.pose.position.x > 1.05)
-        && (msg->pose.pose.position.y < 6.7) && (msg->pose.pose.position.y > 4.8) )
+    if ( (msg->pose.pose.position.x < 3.5) && (msg->pose.pose.position.x > 1.05)
+         && (msg->pose.pose.position.y < 6.7) && (msg->pose.pose.position.y > 4.8) )
 
     {
-        noiseTriger_ =1;
-   }
+
+        areaTriger_ =1;
+        timerNoise_.setPeriod(ros::Duration(10));
+        timerNoise_.start();
+
+
+    }
     else
-       noiseTriger_ = 0;
+        areaTriger_ = 0;
+        timerTriger_ = 0;
 }
 
 
+void LaserNoise::timerNoiseCallback(const ros::TimerEvent&)
+{
+    //uniformTriger_ = 1; // activate uniform noise
+
+    // alternates between noise and no noise
+    // if (noiseTriger_ == 0)
+    //    noiseTriger_ = 1;
+    // else
+    timerTriger_ = 1;
+    //noiseTriger_ = 0;
+    ROS_INFO("TIMER ACTIVATED");
+
+}
 
 // Utility for adding noise
 double LaserNoise::GaussianKernel(double mu,double sigma)
