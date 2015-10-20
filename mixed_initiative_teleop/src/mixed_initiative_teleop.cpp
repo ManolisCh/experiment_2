@@ -96,7 +96,7 @@ JoystickTeleop::JoystickTeleop()
 
   //Default buttons for Xbox 360 joystick.
   nh_.param("teleop_button", teleop_button_, 3); // Y button
-  nh_.param("stop_button", stop_button_, 1);     // B button
+  nh_.param("stop_button", stop_button_, 5);     // LB button
   nh_.param("auto_button", auto_button_, 0);     // A button
 
 
