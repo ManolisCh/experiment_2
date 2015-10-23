@@ -5,8 +5,9 @@
    <remap from="scan" to="scan_final" />
 
   <!-- Set initial position -->
-  <param name="initial_pose_x" value="1.5"/>
-  <param name="initial_pose_y" value="3.2"/>
+  <param name="initial_pose_x" value="-4.68"/>
+  <param name="initial_pose_y" value="5.008"/>
+  <param name="initial_pose_a" value="1.57"/>
   
 
   <!-- General parameters -->
@@ -30,10 +31,10 @@
   <param name="base_frame_id" value="base_link"/>
   <param name="global_frame_id" value="map"/>
   <param name="odom_model_type" value="diff"/>
-  <param name="odom_alpha1" value="0.35"/>
-  <param name="odom_alpha2" value="0.35"/>
-  <param name="odom_alpha3" value="0.35"/>
-  <param name="odom_alpha4" value="0.35"/>
+  <param name="odom_alpha1" value="0.02"/>
+  <param name="odom_alpha2" value="0.02"/>
+  <param name="odom_alpha3" value="0.02"/>
+  <param name="odom_alpha4" value="0.02"/>
  
 
   <!-- Laser model parameters -->
