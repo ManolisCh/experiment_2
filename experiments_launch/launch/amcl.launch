@@ -5,9 +5,9 @@
    <remap from="scan" to="scan_final" />
 
   <!-- Set initial position -->
-  <param name="initial_pose_x" value="-4.68"/>
-  <param name="initial_pose_y" value="5.008"/>
-  <param name="initial_pose_a" value="1.57"/>
+  <param name="initial_pose_x" value="543.2"/>
+  <param name="initial_pose_y" value="56.6"/>
+  <param name="initial_pose_a" value="0"/>
   
 
   <!-- General parameters -->
