@@ -29,7 +29,7 @@
   </node>
 
 <!-- AMCL -->
-<include file="$(find experiments_launch)/launch/amcl.launch"/>
+<include file="$(find experiments_launch)/launch/amcl_training.launch"/>
 
 <!-- Laser noise node to add some extra noise-->
   <node respawn="true" pkg="laser_noise" type="laser_noise_node" name="laser_noise" > 
