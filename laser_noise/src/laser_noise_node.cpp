@@ -60,7 +60,7 @@ void LaserNoise::laserReadCallBAck(const sensor_msgs::LaserScan::ConstPtr& msg)
         for (int i=0; i < addedNoiseScan_.ranges.size() ; i++)
 
         {
-            sigma = addedNoiseScan_.ranges[i] * 0.1; // Proportional standard deviation
+            sigma = addedNoiseScan_.ranges[i] * 0.2; // Proportional standard deviation
             oldRange = addedNoiseScan_.ranges[i] ;
             addedNoiseScan_.ranges[i] = addedNoiseScan_.ranges[i] + GaussianKernel(0,sigma);
 
@@ -84,8 +84,8 @@ void LaserNoise::poseCallback(const geometry_msgs::PoseWithCovarianceStamped::Co
 
 {
 
-    if ( (msg->pose.pose.position.x < 3.5) && (msg->pose.pose.position.x > 1.05)
-         && (msg->pose.pose.position.y < 6.7) && (msg->pose.pose.position.y > 4.8) )
+    if ( (msg->pose.pose.position.x < 534.98) && (msg->pose.pose.position.x > 533.75)
+         && (msg->pose.pose.position.y < 55.12) && (msg->pose.pose.position.y > 47.90) )
 
     {
 
