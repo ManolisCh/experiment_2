@@ -1,10 +1,14 @@
 <launch>
 
-<!-- joy node for aka joystick drivers-->
+<!-- joy node (joystick drivers)-->
   <node respawn="true" pkg="joy" type="joy_node" name="joy_node" >
     <param name="dev" type="string" value="/dev/input/js0" /> <!-- change this /jsX depending on your joystick port -->
     <param name="deadzone" value="0.15" />
   </node> 
+
+   <node respawn="true" pkg="joy" type="joy_node" name="joy2_node" > <!-- second joystick for experimenter logging -->
+    <param name="dev" type="string" value="/dev/input/js1" /> 
+   </node> 
 
 <!-- teleop node -->
 <node pkg="mixed_initiative_teleop" type="mixed_initiative_teleop" name="mi_teleop" output="screen"/>
@@ -36,10 +40,12 @@
       <remap from="/scan_with_noise" to="/scan_final" />
   </node>
 
-<!-- mode and status visualising node -->
+<!-- mode, logging and status visualising nodes -->
 <node pkg="status_publisher" type="status_publisher" name="status_publisher" output="screen"/>
 
+<node pkg="status_publisher" type="experiment_logger" name="experiment_logger" output="screen"/>
+
 <node pkg="rviz" type="rviz" name="rviz" 
-    args="-d $(find experiments_launch)/rviz_cfg/rviz_cfg.rviz"/>
+    args="-d $(find experiments_launch)/rviz_cfg/rviz_cfg.rviz"/> 
 
 </launch>
