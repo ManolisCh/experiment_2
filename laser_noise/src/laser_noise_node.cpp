@@ -22,7 +22,7 @@ public:
 
         scan_pub_ = n_.advertise<sensor_msgs::LaserScan>("scan_with_noise", 50);
 
-        timerNoise_ = n_.createTimer(ros::Duration(5) , &LaserNoise::timerNoiseCallback, this, false, false);
+        timerNoise_ = n_.createTimer(ros::Duration(15) , &LaserNoise::timerNoiseCallback, this, false, false);
 
         areaTriger_ = 0, timerTriger_ =0, timerActivated_= 0;
     }

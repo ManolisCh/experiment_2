@@ -31,12 +31,7 @@ private:
 
 void ExperimentLogger::joyPublishedCallBack(const sensor_msgs::Joy::ConstPtr& msg)
 {
-    //    if (msg->buttons[7] == true)
-    //    {
-    //        std_msgs::Bool started;
-    //        started.data = true;
-    //        experiment_init_pub_.publish(started);
-    //    }
+
 }
 
 void ExperimentLogger::joy2PublishedCallBack(const sensor_msgs::Joy::ConstPtr& msg)
@@ -75,8 +70,8 @@ void ExperimentLogger::joy2PublishedCallBack(const sensor_msgs::Joy::ConstPtr& m
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "workload_rt");
-    ExperimentLogger workloadReactionTime;
+    ros::init(argc, argv, "experiment_logger");
+    ExperimentLogger experimentLogger;
 
     ros::spin();
 

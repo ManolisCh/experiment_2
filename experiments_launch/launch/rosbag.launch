@@ -4,41 +4,38 @@
 <!-- launch rosbag tool but record certain topics-->
 <node pkg="rosbag" type="record" name="rosbag"
 
-       args="-o /home/manolis/rosbags/experiment_1 
+       args="-o /home/manolis/rosbags
                 /joy
+                /joy2
+                /joint_states
                 /navigation/cmd_vel
                 /teleop/cmd_vel
                 /cmd_vel
                 /odom
                 /scan
-                /scan_filtered
+                /scan_final
                 /map
                 /map_metadata
-                /slam_out_pose
-                /poseupdate
-                /slam_gmapping/entropy
+                /map_updates
+                /amcl/parameter_descriptions
+                /amcl/parameter_updates
+		/particlecloud
+                /amcl_pose              
                 /tf
+                /tf_static
 		/trajectory	
-                /RosAria/parameter_updates
-                /RosAria/battery_recharge_state
-                /RosAria/parameter_descriptions
-                /RosAria/motors_state
-                /RosAria/battery_state_of_charge
-                /RosAria/battery_voltage
-                /usb_cam/image_raw/compressed
-                /usb_cam/camera_info
+                /camera/image/camera_info
+                /camera/image/image
                 /control_mode
+		/noise_reset
+		/secondary_task/ended
+		/secondary_task/started
                 /experiment_started
               	/robot_status/nav/compressed
 		/robot_status/mode/compressed/parameter_descriptions
  		/robot_status/nav/compressed/parameter_updates
  		/robot_status/mode/compressed
 		/robot_status/mode/compressed/parameter_updates
-		/workload/img_stimulus/compressed
-		/workload/RT
-		/workload/target_published
-                /workload/missedRT
- 		/workload/img_stimulus/compressed/parameter_descriptions
 	        /clicked_point
   		/move_base/local_costmap/obstacle_layer_footprint/parameter_updates
             	/move_base/NavfnROS/plan

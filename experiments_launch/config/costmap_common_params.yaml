@@ -14,11 +14,11 @@ raytrace_range: 20 #range in meters at which to raytrace out obstacles from the 
 footprint: [ [0.22, 0.21], [0.22, -0.21], [-0.23, -0.21], [-0.23, 0.21] ]
 
 #Inscribed and circumscribed radius 
-#inscribed_radius: 0.2
-#circumscribed_radius: 0.3
+#inscribed_radius: 0.25
+#circumscribed_radius: 0.35
 
 #Cost function parameters
-inflation_radius: 0.5
+inflation_radius: 0.6
 #cost_scaling_factor: 10.0
 
 #The cost at which a cell is considered an obstacle when a map is read from the map_server

@@ -15,7 +15,7 @@
 <node pkg="mixed_initiative_teleop" type="mixed_initiative_teleop" name="mi_teleop" output="screen"/>
 
 <!-- cmd mixer for choosing autonomy mode or e.g. emergency stop if nav doesnt work good. (buttons for teleoperation - stop - autonomy mode) -->
-<!-- In xbox controller Y =  teleop , A = auto , B = stop (in any case) -->
+<!-- In xbox controller Y =  teleop , A = auto , LB = stop (in any case) -->
 <node pkg="mixed_initiative_controller" type="mixed_initiative_controller" name="mi_controller" output="screen"/>
 
 <!-- tf transform -->
@@ -42,11 +42,18 @@
   </node>
 
 <!-- mode, logging and status visualising nodes -->
+<!--+++++++++++++++++++++++++++++++++++++++++++++-->
 <node pkg="status_publisher" type="status_publisher" name="status_publisher" output="screen"/>
 
 <node pkg="status_publisher" type="experiment_logger" name="experiment_logger" output="screen"/>
 
+<!-- Hector trajectory server for keeping history and visualizing of all the paths visited -->
+<node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server" output="screen"/>
+
 <node pkg="rviz" type="rviz" name="rviz" 
     args="-d $(find experiments_launch)/rviz_cfg/rviz_cfg.rviz"/> 
+
+<!-- Robot Model -->
+<include file="$(find p2os_urdf)/launch/pioneer3dx_urdf.launch"/>
 
 </launch>
