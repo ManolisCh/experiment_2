@@ -22,9 +22,9 @@ public:
 
         scan_pub_ = n_.advertise<sensor_msgs::LaserScan>("scan_with_noise", 50);
 
-        timerNoise_ = n_.createTimer(ros::Duration(10) , &LaserNoise::timerNoiseCallback, this, true, false);
+        timerNoise_ = n_.createTimer(ros::Duration(5) , &LaserNoise::timerNoiseCallback, this, false, false);
 
-        areaTriger_ = 0, timerTriger_ =0, timerActivated_= 0, reset_ ;
+        areaTriger_ = 0, timerTriger_ =0, timerActivated_= 0;
     }
 
 private:
@@ -43,12 +43,17 @@ private:
     void timerNoiseCallback(const ros::TimerEvent&);
     void resetCallBack(const std_msgs::Bool::ConstPtr& msg);
 
-    bool areaTriger_ , timerTriger_, timerActivated_, reset_;
+    bool areaTriger_ , timerTriger_, timerActivated_;
 };
 
 
 void LaserNoise::resetCallBack(const std_msgs::Bool::ConstPtr& msg)
 {
+    if (msg->data == true)
+    {
+        timerTriger_ = 0;
+        timerNoise_.stop(); // needed to make sure the timer is not running in background
+    }
 
 }
 
@@ -96,7 +101,6 @@ void LaserNoise::poseCallback(const geometry_msgs::PoseWithCovarianceStamped::Co
 
     {
         areaTriger_ =1;
-        //timerNoise_.setPeriod(ros::Duration(10));
         timerNoise_.start();
     }
     else
@@ -108,6 +112,8 @@ void LaserNoise::poseCallback(const geometry_msgs::PoseWithCovarianceStamped::Co
 void LaserNoise::timerNoiseCallback(const ros::TimerEvent&)
 {
     timerTriger_ = 1;
+    timerNoise_.stop();
+
     ROS_INFO("TIMER ACTIVATED");
 
 }

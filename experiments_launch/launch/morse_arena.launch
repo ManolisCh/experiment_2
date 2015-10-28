@@ -7,7 +7,8 @@
   </node> 
 
    <node respawn="true" pkg="joy" type="joy_node" name="joy2_node" > <!-- second joystick for experimenter logging -->
-    <param name="dev" type="string" value="/dev/input/js1" /> 
+    <param name="dev" type="string" value="/dev/input/js1" />
+    <remap from="/joy" to="/joy2" /> 
    </node> 
 
 <!-- teleop node -->
