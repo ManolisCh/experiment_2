@@ -22,7 +22,7 @@ public:
 
         scan_pub_ = n_.advertise<sensor_msgs::LaserScan>("scan_with_noise", 50);
 
-        timerNoise_ = n_.createTimer(ros::Duration(15) , &LaserNoise::timerNoiseCallback, this, false, false);
+        timerNoise_ = n_.createTimer(ros::Duration(20) , &LaserNoise::timerNoiseCallback, this, false, false);
 
         areaTriger_ = 0, timerTriger_ =0, timerActivated_= 0;
     }
@@ -72,7 +72,7 @@ void LaserNoise::laserReadCallBAck(const sensor_msgs::LaserScan::ConstPtr& msg)
         for (int i=0; i < addedNoiseScan_.ranges.size() ; i++)
 
         {
-            sigma = addedNoiseScan_.ranges[i] * 0.20; // Proportional standard deviation
+            sigma = addedNoiseScan_.ranges[i] * 0.2; // Proportional standard deviation
             oldRange = addedNoiseScan_.ranges[i] ;
             addedNoiseScan_.ranges[i] = addedNoiseScan_.ranges[i] + GaussianKernel(0,sigma);
 
