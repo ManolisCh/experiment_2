@@ -91,7 +91,7 @@ JoystickTeleop::JoystickTeleop()
   nh_.param("axis_angular", angular_axis_, 0);
 
   // Default scaling parameters
-  nh_.param("scale_angular", angular_scaling_, 1.0);
+  nh_.param("scale_angular", angular_scaling_, 0.80);
   nh_.param("scale_linear", linear_scaling_, 0.4);
 
   //Default buttons for Xbox 360 joystick.
@@ -103,7 +103,7 @@ JoystickTeleop::JoystickTeleop()
   vel_pub_ = nh_.advertise<geometry_msgs::Twist>("/teleop/cmd_vel", 5);
   mode_pub_ = nh_.advertise<std_msgs::Int8>("/control_mode", 5);
 
-  joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &JoystickTeleop::joyCallback, this);
+  joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 2, &JoystickTeleop::joyCallback, this);
 
 }
 

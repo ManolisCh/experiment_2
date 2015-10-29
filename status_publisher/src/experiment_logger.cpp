@@ -16,8 +16,8 @@ public:
         secondaryTask_end_pub_ = nh_.advertise<std_msgs::Bool>("/secondary_task/ended", 1);
         noiseReset_pub_ = nh_.advertise<std_msgs::Bool>("/noise_reset", 1);
 
-        joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy", 1 , &ExperimentLogger::joyPublishedCallBack,this);
-        joy2_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy2", 1 , &ExperimentLogger::joy2PublishedCallBack,this);
+        joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy", 2 , &ExperimentLogger::joyPublishedCallBack,this);
+        joy2_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy2", 2 , &ExperimentLogger::joy2PublishedCallBack,this);
     }
 
 private:
