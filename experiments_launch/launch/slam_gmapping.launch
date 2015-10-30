@@ -8,6 +8,10 @@
       <param name="ymin" value="-7.0"/>
       <param name="xmax" value="7.0"/>
       <param name="ymax" value="7.0"/>
+      <param name="srr" value="0.001"/>
+      <param name="srt" value="0.001"/>
+      <param name="str" value="0.0001"/>
+      <param name="stt" value="0.001"/>
       <param name="delta" value="0.025"/>
      <param name="maxRange" value="28"/>
      <remap from="scan" to="scan_final" />
