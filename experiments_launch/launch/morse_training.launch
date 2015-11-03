@@ -40,6 +40,6 @@
 <node pkg="status_publisher" type="status_publisher" name="status_publisher" output="screen"/>
 
 <node pkg="rviz" type="rviz" name="rviz" 
-    args="-d $(find experiments_launch)/rviz_cfg/rviz_cfg.rviz"/>
+    args="-d $(find experiments_launch)/rviz_cfg/rviz_training.rviz"/>
 
 </launch>
