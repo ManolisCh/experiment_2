@@ -37,6 +37,15 @@ private:
     sensor_msgs::LaserScan addedNoiseScan_;
     ros::Timer timerNoise_ ;
 
+    //n_.param("noise_period", noise_period_, 30.0);
+    //n_.param("x_max", x_max_, 4.0);
+    //n_.param("x_min", x_min_, 4.0);
+    //n_.param("y_max", y_max_, 4.0);
+    //n_.param("y_mix", y_min_, 4.0);
+
+   //ROS_INFO("VAR %f", var_pub_period_);
+    //ROS_INFO("TARGET %f", target_pub_period_);
+
     void laserReadCallBAck(const sensor_msgs::LaserScan::ConstPtr& msg);
     double GaussianKernel(double mu,double sigma), uniformNoise_;
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
