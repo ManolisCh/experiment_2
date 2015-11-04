@@ -34,6 +34,11 @@
 <!-- Laser noise node to add some extra noise-->
   <node respawn="true" pkg="laser_noise" type="laser_noise_node" name="laser_noise" > 
       <remap from="/scan_with_noise" to="/scan_final" />
+      <param name="noise_period" value="10" />
+      <param name="x_max" value="54.22" />
+      <param name="x_min" value="52.8" />
+      <param name="y_max" value="88.92" />
+      <param name="y_min" value="86.47" />
   </node>
 
 <!-- mode and status visualising node -->

@@ -28,6 +28,7 @@
                 /camera/image/image
                 /control_mode
 		/noise_reset
+    /noise_active
 		/secondary_task/ended
 		/secondary_task/started
                 /experiment_started
