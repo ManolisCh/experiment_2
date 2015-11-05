@@ -16,11 +16,11 @@
 
 
 
-class StatusPublisher
+class CamCompress
 {
 public:
 
-  StatusPublisher();
+  CamCompress();
   void run();
 
 private:
@@ -41,7 +41,7 @@ private:
 };
 
 // Constractor
-StatusPublisher::StatusPublisher(): it_(nh_)
+CamCompress::CamCompress(): it_(nh_)
 {
   randomGen_.seed(time(NULL));
 
@@ -57,7 +57,7 @@ StatusPublisher::StatusPublisher(): it_(nh_)
   stimulus_pub_ = it_.advertise("/workload/img_stimulus", 1);
   targetPublished_pub = nh_.advertise<pub_stimulus::TargetStimulus>("/workload/target_published", 1);
     // The ros Duration controls the period in sec. that the target will appear.
-  timerTarget_ = nh_.createTimer(ros::Duration(target_pub_period_ - (var_pub_period_/2) ), &StatusPublisher::timerTargetCallback, this);
+  timerTarget_ = nh_.createTimer(ros::Duration(target_pub_period_ - (var_pub_period_/2) ), &CamCompress::timerTargetCallback, this);
 
 
   // Path where the image stimulus is
@@ -91,7 +91,7 @@ StatusPublisher::StatusPublisher(): it_(nh_)
 }
 
  // The publish target callback
-void StatusPublisher::timerTargetCallback(const ros::TimerEvent&)
+void CamCompress::timerTargetCallback(const ros::TimerEvent&)
 {
 
   boost::uniform_real<float> dist(0,var_pub_period_) ;
@@ -112,7 +112,7 @@ void StatusPublisher::timerTargetCallback(const ros::TimerEvent&)
 
 
 // Definitiion of run() function that has the main functionality
-void StatusPublisher::run()
+void CamCompress::run()
 {
   stimulus_pub_.publish(rosImageBackground_);
 }
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
 
   ros::init(argc, argv, "pub_stimulus");
 
-  StatusPublisher publishstimulus;
+  CamCompress publishstimulus;
 
 
   ros::Rate loop_rate(10);

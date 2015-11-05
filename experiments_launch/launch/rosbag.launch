@@ -24,8 +24,9 @@
                 /tf
                 /tf_static
 		/trajectory	
-                /camera/image/camera_info
-                /camera/image/image
+/cam_compress/image/compressed
+/cam_compress/image/compressed/parameter_descriptions
+/cam_compress/image/compressed/parameter_updates
                 /control_mode
 		/noise_reset
     /noise_active

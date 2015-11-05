@@ -44,8 +44,8 @@
 <!-- mode, logging and status visualising nodes -->
 <!--+++++++++++++++++++++++++++++++++++++++++++++-->
 <node pkg="status_publisher" type="status_publisher" name="status_publisher" output="screen"/>
-
 <node pkg="status_publisher" type="experiment_logger" name="experiment_logger" output="screen"/>
+<node pkg="status_publisher" type="cam_compress" name="cam_compress" output="screen"/>
 
 <!-- Hector trajectory server for keeping history and visualizing of all the paths visited -->
 <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory_server" output="screen"/>

@@ -56,6 +56,7 @@ include_directories(
 ## Declare a cpp executable
  add_executable(status_publisher src/status_publisher.cpp) 
  add_executable(experiment_logger src/experiment_logger.cpp)
+ add_executable(cam_compress src/cam_compress.cpp)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(status_publisher_node status_publisher_generate_messages_cpp)
@@ -66,5 +67,9 @@ include_directories(
  )
 
 target_link_libraries(experiment_logger
+   ${catkin_LIBRARIES}
+ )
+
+target_link_libraries(cam_compress
    ${catkin_LIBRARIES}
  )

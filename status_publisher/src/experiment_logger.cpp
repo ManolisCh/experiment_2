@@ -7,18 +7,18 @@
 
 
 
-class ExperimentLogger
+class CamCompress
 {
 public:
-    ExperimentLogger()
+    CamCompress()
     {
         experiment_init_pub_ = nh_.advertise<std_msgs::Bool>("/experiment_started", 1);
         secondaryTask_init_pub_ = nh_.advertise<std_msgs::Bool>("/secondary_task/started", 1);
         secondaryTask_end_pub_ = nh_.advertise<std_msgs::Bool>("/secondary_task/ended", 1);
         noiseReset_pub_ = nh_.advertise<std_msgs::Bool>("/noise_reset", 1);
 
-        joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy", 2 , &ExperimentLogger::joyPublishedCallBack,this);
-        joy2_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy2", 2 , &ExperimentLogger::joy2PublishedCallBack,this);
+        joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy", 2 , &CamCompress::joyPublishedCallBack,this);
+        joy2_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy2", 2 , &CamCompress::joy2PublishedCallBack,this);
         clearCostmapSrv_ = nh_.serviceClient<std_srvs::Empty>("move_base/clear_costmaps") ;
     }
 
@@ -33,12 +33,12 @@ private:
 };
 
 
-void ExperimentLogger::joyPublishedCallBack(const sensor_msgs::Joy::ConstPtr& msg)
+void CamCompress::joyPublishedCallBack(const sensor_msgs::Joy::ConstPtr& msg)
 {
 
 }
 
-void ExperimentLogger::joy2PublishedCallBack(const sensor_msgs::Joy::ConstPtr& msg)
+void CamCompress::joy2PublishedCallBack(const sensor_msgs::Joy::ConstPtr& msg)
 {
     if (msg->buttons[7] == true) // denotes when the trials starts and when it finishes (START<!-- change this /jsX depending on your joystick port --> button)
     {
@@ -82,7 +82,7 @@ void ExperimentLogger::joy2PublishedCallBack(const sensor_msgs::Joy::ConstPtr& m
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "experiment_logger");
-    ExperimentLogger experimentLogger;
+    CamCompress experimentLogger;
 
     ros::spin();
 

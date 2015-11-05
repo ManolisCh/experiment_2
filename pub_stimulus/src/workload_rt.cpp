@@ -7,10 +7,10 @@
 
 
 
-class ExperimentLogger
+class CamCompress
 {
 public:
-  ExperimentLogger()
+  CamCompress()
   {
     experimentStarted_ = false;
     pressed_ = true; // must initialised like that for flag further down to work
@@ -19,9 +19,9 @@ public:
     rt_pub_ = nh_.advertise<pub_stimulus::ReactionTime>("/workload/RT", 1);
 
 
-    joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy", 1 , &ExperimentLogger::joyPublishedCallBack,this);
+    joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy", 1 , &CamCompress::joyPublishedCallBack,this);
     target_sub = nh_.subscribe<pub_stimulus::TargetStimulus>("/workload/target_published", 1 ,
-                                                             &ExperimentLogger::targetPublishedCallBAck,this);
+                                                             &CamCompress::targetPublishedCallBAck,this);
 
   }
 private:
@@ -39,7 +39,7 @@ private:
 
 };
 
-void ExperimentLogger::targetPublishedCallBAck(const pub_stimulus::TargetStimulus::ConstPtr& msg)
+void CamCompress::targetPublishedCallBAck(const pub_stimulus::TargetStimulus::ConstPtr& msg)
 
 {
   published_ = msg->published.data; // Store if published for use as a flag inside the class
@@ -68,7 +68,7 @@ void ExperimentLogger::targetPublishedCallBAck(const pub_stimulus::TargetStimulu
     }
 }
 
-void ExperimentLogger::joyPublishedCallBack(const sensor_msgs::Joy::ConstPtr& msg)
+void CamCompress::joyPublishedCallBack(const sensor_msgs::Joy::ConstPtr& msg)
 {
 
   if (msg->buttons[5] == true)
@@ -97,7 +97,7 @@ void ExperimentLogger::joyPublishedCallBack(const sensor_msgs::Joy::ConstPtr& ms
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "workload_rt");
-  ExperimentLogger workloadReactionTime;
+  CamCompress workloadReactionTime;
 
   ros::spin();
 
