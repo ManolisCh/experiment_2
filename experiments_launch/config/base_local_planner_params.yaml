@@ -48,8 +48,6 @@ TrajectoryPlannerROS:
   gdist_scale: 0.72 #weight on how much should attempt to reach is local goal, also controls speed.
   occdist_scale: 0.01 #weight on how much should attempt to avoid obstacles (in my experience leave like that!)
 
-  prune_plan: true
-
 
 
 
