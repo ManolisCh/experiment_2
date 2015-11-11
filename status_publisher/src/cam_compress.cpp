@@ -9,7 +9,7 @@ public:
 
     CamCompress(): it_(nh_)
     {
-        sub_ = it_.subscribe("/morse_cam/image", 1, &CamCompress::imageCallback, this);
+        sub_ = it_.subscribe("/robot_cam/image", 1, &CamCompress::imageCallback, this);
         pub_ = it_.advertise("cam_compress/image", 1);
     }
 
