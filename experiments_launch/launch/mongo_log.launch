@@ -1,0 +1,27 @@
+<launch>
+
+
+<!-- launch mongodb_log tool to record certain topics in mongodb format-->
+<node pkg="mongodb_log" type="mongodb_log.py" name="mongodb_log"
+
+       args=" /joy
+                /cmd_vel
+                /odom
+                /scan_final
+                /map
+                /amcl_pose         
+                /tf
+                /tf_static
+                /trajectory   
+                /control_mode
+                /noise_active
+                /secondary_task/ended
+                /secondary_task/started
+                /experiment_started
+                /move_base/NavfnROS/plan
+                /move_base/status
+                /move_base/TrajectoryPlannerROS/local_plan
+                /move_base/local_costmap/costmap
+               /move_base/result" />
+
+</launch>
