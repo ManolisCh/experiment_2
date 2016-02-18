@@ -34,7 +34,6 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>gmapping</build_depend>
-  <build_depend>mixed_initiative_controller</build_depend>
   <build_depend>mixed_initiative_teleop</build_depend>
   <build_depend>move_base</build_depend>
   <run_depend>gmapping</run_depend>

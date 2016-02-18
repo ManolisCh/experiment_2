@@ -6,7 +6,6 @@ project(experiments_launch)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   gmapping
-  mixed_initiative_controller
   mixed_initiative_teleop
   move_base
 )
