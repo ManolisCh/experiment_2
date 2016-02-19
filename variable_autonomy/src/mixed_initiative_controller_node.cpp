@@ -29,10 +29,11 @@ private:
     void robotVelCallback(const geometry_msgs::Twist::ConstPtr& msg);
     void computeCostCallback(const ros::TimerEvent&);
 
-    int loa_;
+    int loa_, number_timesteps_ , count_timesteps_;
     bool valid_loa_;
+    double error_sum_, error_average_, a_,vel_error_ ;
     std_msgs::Bool loa_change_;
-    std_msgs::Float64 vel_error_msg_;
+    std_msgs::Float64 error_average_msg_;
 
     ros::NodeHandle n_;
     ros::Subscriber loa_sub_ ,vel_robot_sub_ , vel_robot_optimal_sub_;
@@ -49,6 +50,10 @@ MixedInitiativeController::MixedInitiativeController()
 
     loa_change_.data = false;
     valid_loa_ = false;
+    a_ = 0.02; // smoothing factor between [0,1]
+    number_timesteps_ = 45; // # of time steps used to initialize average
+    count_timesteps_ = 1; // counts the # of time steps used to initialize average
+
 
     loa_change_pub_ = n_.advertise<std_msgs::Bool>("/loa_change", 1);
     vel_error_pub_ = n_.advertise<std_msgs::Float64>("/vel_error", 1);
@@ -113,19 +118,36 @@ void MixedInitiativeController::robotVelOptimalCallback(const geometry_msgs::Twi
 // Where magic happens, it computes the cost to judge in switching LAO
 void MixedInitiativeController::computeCostCallback(const ros::TimerEvent&)
 { 
-    vel_error_msg_.data = cmdvel_optimal_.linear.x - cmdvel_robot_.linear.x;
-    vel_error_msg_.data = fabs(vel_error_msg_.data);
+    vel_error_ = cmdvel_optimal_.linear.x - cmdvel_robot_.linear.x;
+    vel_error_ = fabs(vel_error_);
 
-    if (vel_error_msg_.data > 0.04)
+    // calculates the average used to initialize exponential moving average
+    if (count_timesteps_ <= number_timesteps_)
     {
-        loa_change_.data = true;
-        loa_change_pub_.publish(loa_change_);
+        error_sum_ += vel_error_;
+        error_average_ = error_sum_ / number_timesteps_;
+        count_timesteps_++;
     }
+    // calculates  exponential moving average
+    else if (count_timesteps_ > number_timesteps_)
+    {
+        error_average_ = a_ * vel_error_ + (1-a_) * error_average_;
 
-    else {
-        loa_change_.data = false;
-        loa_change_pub_.publish(loa_change_);
+        if (error_average_ > 0.07)
+        {
+            loa_change_.data = true;
+            loa_change_pub_.publish(loa_change_);
+        }
+        else
+        {
+            loa_change_.data = false;
+            loa_change_pub_.publish(loa_change_);
+        }
+
+
     }
+    error_average_msg_.data = error_average_;
+    vel_error_pub_.publish(error_average_msg_);
 }
 
 
