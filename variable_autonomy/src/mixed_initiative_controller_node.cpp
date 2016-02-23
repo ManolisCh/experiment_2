@@ -50,7 +50,7 @@ MixedInitiativeController::MixedInitiativeController()
 
     loa_change_.data = false;
     valid_loa_ = false;
-    a_ = 0.02; // smoothing factor between [0,1]
+    a_ = 0.04; // smoothing factor between [0,1]
     number_timesteps_ = 45; // # of time steps used to initialize average
     count_timesteps_ = 1; // counts the # of time steps used to initialize average
 
@@ -63,7 +63,7 @@ MixedInitiativeController::MixedInitiativeController()
     vel_robot_optimal_sub_ = n_.subscribe("/cmd_vel_optimal", 5 , &MixedInitiativeController::robotVelOptimalCallback, this); // The optimal velocity e.g. perfect move_base
 
     // The ros Duration controls the period in sec. that the cost will compute. currently 10hz
-    compute_cost_ = n_.createTimer(ros::Duration(0.1), &MixedInitiativeController::computeCostCallback, this);
+    compute_cost_ = n_.createTimer(ros::Duration(0.2), &MixedInitiativeController::computeCostCallback, this);
 
 }
 
@@ -133,7 +133,7 @@ void MixedInitiativeController::computeCostCallback(const ros::TimerEvent&)
     {
         error_average_ = a_ * vel_error_ + (1-a_) * error_average_;
 
-        if (error_average_ > 0.07)
+        if (error_average_ > 0.08)
         {
             loa_change_.data = true;
             loa_change_pub_.publish(loa_change_);

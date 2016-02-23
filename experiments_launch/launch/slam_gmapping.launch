@@ -3,15 +3,16 @@
     <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
       <param name="odom_frame" value="odom"/> 
       <param name="maxUrange" value="28"/>
-      <!--param name="particles" value="60"/-->
+      <param name="particles" value="1"/>
+      <param name="minimumScore" value="1000"/>
       <param name="xmin" value="-7.0"/>
       <param name="ymin" value="-7.0"/>
       <param name="xmax" value="7.0"/>
       <param name="ymax" value="7.0"/>
-      <param name="srr" value="0.001"/>
-      <param name="srt" value="0.001"/>
-      <param name="str" value="0.0001"/>
-      <param name="stt" value="0.001"/>
+      <param name="srr" value="0"/>
+      <param name="srt" value="0"/>
+      <param name="str" value="0"/>
+      <param name="stt" value="0"/>
       <param name="delta" value="0.025"/>
      <param name="maxRange" value="28"/>
      <remap from="scan" to="scan_final" />

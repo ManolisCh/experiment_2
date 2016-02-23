@@ -18,18 +18,18 @@ public:
         ros::NodeHandle private_nh("laser_noise");
         // Initialise the noise period and the rectacular area of noise bounded by the rectacle of which the 4 points are the corners.
         private_nh.param("noise_period", noise_period_, 30.0);
-        private_nh.param("x_max", x_max_, 535.25);
-        private_nh.param("x_min", x_min_, 533.55);
-        private_nh.param("y_max", y_max_, 55.3);
-        private_nh.param("y_min", y_min_, 47.7);
+        private_nh.param("x_max", x_max_, 532.61);
+        private_nh.param("x_min", x_min_, 531.10);
+        private_nh.param("y_max", y_max_, 48.41);
+        private_nh.param("y_min", y_min_, 41.24);
 
         //randomGen_.seed(time(NULL)); // seed the generator
-        laser_sub_ = n_.subscribe<sensor_msgs::LaserScan>("scan", 50, &LaserNoise::laserReadCallBAck, this);
-        pose_sub_ = n_.subscribe<geometry_msgs::PoseWithCovarianceStamped>("amcl_pose", 50, &LaserNoise::poseCallback, this);
-        reset_node_sub_ = n_.subscribe<std_msgs::Bool>("/noise_reset", 50, &LaserNoise::resetCallBack, this);
+        laser_sub_ = n_.subscribe<sensor_msgs::LaserScan>("scan", 20, &LaserNoise::laserReadCallBAck, this);
+        pose_sub_ = n_.subscribe<geometry_msgs::PoseWithCovarianceStamped>("amcl_pose", 20, &LaserNoise::poseCallback, this);
+        reset_node_sub_ = n_.subscribe<std_msgs::Bool>("/noise_reset", 20, &LaserNoise::resetCallBack, this);
 
-        scan_pub_ = n_.advertise<sensor_msgs::LaserScan>("scan_with_noise", 50);
-        noise_active_pub_ = n_.advertise<std_msgs::Bool>("noise_active", 50);
+        scan_pub_ = n_.advertise<sensor_msgs::LaserScan>("scan_with_noise", 20);
+        noise_active_pub_ = n_.advertise<std_msgs::Bool>("noise_active", 20);
 
         timerNoise_ = n_.createTimer(ros::Duration(noise_period_) , &LaserNoise::timerNoiseCallback, this, false, false);
 
