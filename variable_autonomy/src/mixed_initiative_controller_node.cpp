@@ -31,7 +31,7 @@ private:
 
     int loa_, number_timesteps_ , count_timesteps_;
     bool valid_loa_;
-    double error_sum_, error_average_, a_,vel_error_ ;
+    double error_sum_, error_average_, a_,vel_error_ , vel_error_threshold_;
     std_msgs::Bool loa_change_;
     std_msgs::Float64 error_average_msg_;
 
@@ -51,7 +51,9 @@ MixedInitiativeController::MixedInitiativeController()
     loa_change_.data = false;
     valid_loa_ = false;
     a_ = 0.04; // smoothing factor between [0,1]
-    number_timesteps_ = 45; // # of time steps used to initialize average
+    vel_error_threshold_ = 0.085;
+
+    number_timesteps_ = 30; // # of time steps used to initialize average
     count_timesteps_ = 1; // counts the # of time steps used to initialize average
 
 
@@ -115,7 +117,7 @@ void MixedInitiativeController::robotVelOptimalCallback(const geometry_msgs::Twi
     cmdvel_optimal_ = *msg;
 }
 
-// Where magic happens, it computes the cost to judge in switching LAO
+// Where magic happens, it computes the cost, judging to switch LAO
 void MixedInitiativeController::computeCostCallback(const ros::TimerEvent&)
 { 
     vel_error_ = cmdvel_optimal_.linear.x - cmdvel_robot_.linear.x;
@@ -133,21 +135,25 @@ void MixedInitiativeController::computeCostCallback(const ros::TimerEvent&)
     {
         error_average_ = a_ * vel_error_ + (1-a_) * error_average_;
 
-        if (error_average_ > 0.08)
+        if ( (error_average_ > vel_error_threshold_) && (loa_change_.data == false) )
         {
             loa_change_.data = true;
             loa_change_pub_.publish(loa_change_);
+            count_timesteps_ = 1; // enables re-initializaion of moving average by reseting count
+            //loa_change_.data = false; // resets loa_change flag
+            error_sum_ = 0; // resets sumation of errors for initial estimate
         }
-        else
+        else if ((error_average_ < vel_error_threshold_) && loa_change_.data == true)
         {
             loa_change_.data = false;
             loa_change_pub_.publish(loa_change_);
         }
 
-
     }
+
     error_average_msg_.data = error_average_;
     vel_error_pub_.publish(error_average_msg_);
+
 }
 
 
@@ -156,7 +162,7 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "mixed_initiative_controller");
     MixedInitiativeController controller_obj;
 
-    ros::Rate r(20); // 20 hz
+    ros::Rate r(10); // 10 hz
     while (ros::ok())
     {
         ros::spinOnce();

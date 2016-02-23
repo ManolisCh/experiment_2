@@ -13,7 +13,7 @@ TrajectoryPlannerROS:
   global_frame_id: /odom #Should be set to the same frame as the local costmap's global frame
 
   #Set the acceleration limits of the robot in meters/sec^2  
-  acc_lim_x: 0.5
+  acc_lim_x: 0.7
   acc_lim_theta: 2 
 
   #Set the velocity limits of the robot
@@ -32,7 +32,7 @@ TrajectoryPlannerROS:
 
   #Forward Simulation Parameters
   #We'll configure how long and with what granularity we'll forward simulate trajectories
-  sim_time: 1.5 # 2 * (goal_tolerance) >  ( min_vel * sim_time ) ... ore else the robot wont move
+  sim_time: 1 # 2 * (goal_tolerance) >  ( min_vel * sim_time ) ... ore else the robot wont move
   sim_granularity: 0.025
 
   #The number of samples to use when exploring the x and theta velocity space

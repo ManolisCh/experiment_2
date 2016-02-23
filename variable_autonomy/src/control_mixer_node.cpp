@@ -26,17 +26,19 @@ private:
     void loaCallback(const std_msgs::Int8::ConstPtr& msg); // LAO topic
     void teleopCallback(const geometry_msgs::Twist::ConstPtr& msg); // velocity from joystick
     void navCallback(const geometry_msgs::Twist::ConstPtr& msg); //velocity from the navigation e.g. move_base
+    void miCommandCallback(const std_msgs::Bool::ConstPtr& msg);
 
     int loa_;
     bool valid_loa_;
 
     ros::NodeHandle n_;
-    ros::Subscriber control_mode_sub_, vel_teleop_sub_, vel_nav_sub_ ;
-    ros::Publisher vel_for_robot_pub_ , cancelGoal_pub_ ;
+    ros::Subscriber control_mode_sub_, vel_teleop_sub_, vel_nav_sub_ , mi_controller_sub_;
+    ros::Publisher vel_for_robot_pub_ , cancelGoal_pub_ , loa_pub_;
     ros::Timer compute_cost_;
 
     geometry_msgs::Twist cmdvel_for_robot_;
     actionlib_msgs::GoalID cancelGoal_;
+    std_msgs::Int8 loa_msg_;
 
 };
 
@@ -50,10 +52,12 @@ ControlMixer::ControlMixer()
 
     vel_for_robot_pub_ = n_.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
     cancelGoal_pub_ = n_.advertise<actionlib_msgs::GoalID>("/move_base/cancel", 1);
+    loa_pub_ = n_.advertise<std_msgs::Int8>("/control_mode",1);
 
     control_mode_sub_ = n_.subscribe("/control_mode", 5, &ControlMixer::loaCallback, this); // the LOA (from joystick)
     vel_teleop_sub_ = n_.subscribe("/teleop/cmd_vel", 5, &ControlMixer::teleopCallback, this); // velocity coming from the teleoperation (Joystick)
     vel_nav_sub_ = n_.subscribe("/navigation/cmd_vel",5, &ControlMixer::navCallback, this); // velocity from the navigation e.g. move_base
+    mi_controller_sub_ = n_.subscribe("/loa_change", 5, &ControlMixer::miCommandCallback, this); // MI controller LOA change command
 }
 
 // reads control mode topic to inform class internal variable
@@ -139,6 +143,26 @@ void ControlMixer::teleopCallback(const geometry_msgs::Twist::ConstPtr &msg)
     }
 
 }
+
+void ControlMixer::miCommandCallback(const std_msgs::Bool::ConstPtr& msg)
+{
+    if (msg->data == true && loa_ == 1)
+    {
+        loa_msg_.data = 2;
+        loa_pub_.publish(loa_msg_);
+    }
+    else if (msg->data == true && loa_ == 2)
+    {
+        loa_msg_.data = 1;
+        loa_pub_.publish(loa_msg_);
+    }
+    else if (msg->data == true && loa_ == 0)
+    {
+        loa_msg_.data = 1;
+        loa_pub_.publish(loa_msg_);
+    }
+}
+
 
 
 // Main function stuff

@@ -9,7 +9,7 @@
 TrajectoryPlannerROS:
 
   dwa: true #use the Dynamic Window Approach
-
+  prune_plan: true
   global_frame_id: /odom #Should be set to the same frame as the local costmap's global frame
 
   #Set the acceleration limits of the robot in meters/sec^2  
