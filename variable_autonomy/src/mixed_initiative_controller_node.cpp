@@ -51,9 +51,9 @@ MixedInitiativeController::MixedInitiativeController()
     loa_change_.data = false;
     valid_loa_ = false;
     a_ = 0.04; // smoothing factor between [0,1]
-    vel_error_threshold_ = 0.085;
+    vel_error_threshold_ = 0.09;
 
-    number_timesteps_ = 30; // # of time steps used to initialize average
+    number_timesteps_ = 25; // # of time steps used to initialize average
     count_timesteps_ = 1; // counts the # of time steps used to initialize average
 
 
@@ -140,8 +140,9 @@ void MixedInitiativeController::computeCostCallback(const ros::TimerEvent&)
             loa_change_.data = true;
             loa_change_pub_.publish(loa_change_);
             count_timesteps_ = 1; // enables re-initializaion of moving average by reseting count
-            //loa_change_.data = false; // resets loa_change flag
+            loa_change_.data = false; // resets loa_change flag
             error_sum_ = 0; // resets sumation of errors for initial estimate
+            ros::Duration(10).sleep();
         }
         else if ((error_average_ < vel_error_threshold_) && loa_change_.data == true)
         {

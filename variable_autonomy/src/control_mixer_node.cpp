@@ -76,6 +76,9 @@ void ControlMixer::loaCallback(const std_msgs::Int8::ConstPtr& msg)
     {
         loa_ = 1;
         valid_loa_ = true;
+        cmdvel_for_robot_.linear.x = 0;
+        cmdvel_for_robot_.angular.z = 0;
+        vel_for_robot_pub_.publish(cmdvel_for_robot_); // solves bug in which last auto msg if propagated in teleop
         ROS_INFO("Control mode: Teleoperation");
         break;
     }
@@ -136,16 +139,9 @@ void ControlMixer::teleopCallback(const geometry_msgs::Twist::ConstPtr &msg)
         vel_for_robot_pub_.publish(cmdvel_for_robot_);
         cancelGoal_pub_.publish(cancelGoal_);
     }
-
-//    else
-//    {
-//        cmdvel_for_robot_.linear.x = 0;
-//        cmdvel_for_robot_.angular.z = 0;
-//        vel_for_robot_pub_.publish(cmdvel_for_robot_);
-//    }
-
 }
 
+// reads the loa change command from MI controller and switchies to appropriate mode
 void ControlMixer::miCommandCallback(const std_msgs::Bool::ConstPtr& msg)
 {
     if (msg->data == true && loa_ == 1)
