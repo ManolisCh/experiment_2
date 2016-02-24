@@ -34,7 +34,6 @@ private:
     ros::NodeHandle n_;
     ros::Subscriber control_mode_sub_, vel_teleop_sub_, vel_nav_sub_ , mi_controller_sub_;
     ros::Publisher vel_for_robot_pub_ , cancelGoal_pub_ , loa_pub_;
-    ros::Timer compute_cost_;
 
     geometry_msgs::Twist cmdvel_for_robot_;
     actionlib_msgs::GoalID cancelGoal_;
@@ -84,6 +83,9 @@ void ControlMixer::loaCallback(const std_msgs::Int8::ConstPtr& msg)
     {
         loa_ = 2;
         valid_loa_ = true;
+        cmdvel_for_robot_.linear.x = 0;
+        cmdvel_for_robot_.angular.z = 0;
+        vel_for_robot_pub_.publish(cmdvel_for_robot_); // solves bug in which last teleop msg if propagated in auto
         ROS_INFO("Control mode: Autonomy");
         break;
     }
@@ -135,12 +137,12 @@ void ControlMixer::teleopCallback(const geometry_msgs::Twist::ConstPtr &msg)
         cancelGoal_pub_.publish(cancelGoal_);
     }
 
-    else
-    {
-        cmdvel_for_robot_.linear.x = 0;
-        cmdvel_for_robot_.angular.z = 0;
-        vel_for_robot_pub_.publish(cmdvel_for_robot_);
-    }
+//    else
+//    {
+//        cmdvel_for_robot_.linear.x = 0;
+//        cmdvel_for_robot_.angular.z = 0;
+//        vel_for_robot_pub_.publish(cmdvel_for_robot_);
+//    }
 
 }
 
