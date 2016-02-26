@@ -42,6 +42,9 @@
       <remap from="/scan_with_noise" to="/scan_final" />
   </node>
 
+<!-- Play sounds -->
+<node pkg="sound_play" type="soundplay_node.py" name="soundplay_node" output="screen"/> 
+
 <!-- mode, logging and status visualising nodes -->
 <!--+++++++++++++++++++++++++++++++++++++++++++++-->
 <node pkg="status_publisher" type="status_publisher" name="status_publisher" output="screen"/>
