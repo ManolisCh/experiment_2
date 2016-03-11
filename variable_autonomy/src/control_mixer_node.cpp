@@ -40,7 +40,7 @@ private:
     geometry_msgs::Twist cmdvel_for_robot_;
     actionlib_msgs::GoalID cancelGoal_;
     std_msgs::Int8 loa_msg_;
-    sound_play::SoundClient sound_client_;
+    sound_play::SoundClient sound_client_ ;
 };
 
 ControlMixer::ControlMixer()
@@ -157,9 +157,8 @@ void ControlMixer::miCommandCallback(const std_msgs::Bool::ConstPtr& msg)
         cmdvel_for_robot_.linear.x = 0;
         cmdvel_for_robot_.angular.z = 0;
         vel_for_robot_pub_.publish(cmdvel_for_robot_); // solves bug in which last auto msg if propagated in teleop
-        sound_client_.playWaveFromPkg("variable_autonomy","auto_pilot.wav");
-        ros::Duration(1.5).sleep();
-        //sound_client_.say("autonomy!");
+        //sound_client_.playWaveFromPkg("variable_autonomy","auto_pilot.wav");
+
     }
     else if (msg->data == true && loa_ == 2)
     {
@@ -168,9 +167,8 @@ void ControlMixer::miCommandCallback(const std_msgs::Bool::ConstPtr& msg)
         cmdvel_for_robot_.linear.x = 0;
         cmdvel_for_robot_.angular.z = 0;
         vel_for_robot_pub_.publish(cmdvel_for_robot_); // solves bug in which last auto msg if propagated in teleop
-        sound_client_.playWaveFromPkg("variable_autonomy","auto_pilot.wav");
-        ros::Duration(1.5).sleep();
-        //sound_client_.say("teleoperation!");
+        //sound_client_.playWaveFromPkg("variable_autonomy","auto_pilot.wav");
+
     }
     else if (msg->data == true && loa_ == 0)
     {

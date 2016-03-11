@@ -17,10 +17,10 @@
 #include <actionlib_msgs/GoalID.h>
 
 
-class MixedInitiativeController
+class ControlDataLogger
 {
 public:
-    MixedInitiativeController() ;
+    ControlDataLogger() ;
 
 private:
 
@@ -45,12 +45,12 @@ private:
 
 };
 
-MixedInitiativeController::MixedInitiativeController()
+ControlDataLogger::ControlDataLogger()
 {
 
     loa_change_.data = false;
     valid_loa_ = false;
-    a_ = 0.04; // smoothing factor between [0,1]
+    a_ = 0.066; // smoothing factor between [0,1]
     vel_error_threshold_ = 0.09;
 
     number_timesteps_ = 25; // # of time steps used to initialize average
@@ -60,16 +60,16 @@ MixedInitiativeController::MixedInitiativeController()
     loa_change_pub_ = n_.advertise<std_msgs::Bool>("/loa_change", 1);
     vel_error_pub_ = n_.advertise<std_msgs::Float64>("/vel_error", 1);
 
-    loa_sub_ = n_.subscribe("/control_mode", 5, &MixedInitiativeController::loaCallback, this); // the current LOA
-    vel_robot_sub_ = n_.subscribe("/cmd_vel", 5 , &MixedInitiativeController::robotVelCallback, this); // current velocity of the robot.
-    vel_robot_optimal_sub_ = n_.subscribe("/cmd_vel_optimal", 5 , &MixedInitiativeController::robotVelOptimalCallback, this); // The optimal velocity e.g. perfect move_base
+    loa_sub_ = n_.subscribe("/control_mode", 5, &ControlDataLogger::loaCallback, this); // the current LOA
+    vel_robot_sub_ = n_.subscribe("/cmd_vel", 5 , &ControlDataLogger::robotVelCallback, this); // current velocity of the robot.
+    vel_robot_optimal_sub_ = n_.subscribe("/cmd_vel_optimal", 5 , &ControlDataLogger::robotVelOptimalCallback, this); // The optimal velocity e.g. perfect move_base
 
     // The ros Duration controls the period in sec. that the cost will compute. currently 10hz
-    compute_cost_ = n_.createTimer(ros::Duration(0.2), &MixedInitiativeController::computeCostCallback, this);
+    compute_cost_ = n_.createTimer(ros::Duration(0.2), &ControlDataLogger::computeCostCallback, this);
 
 }
 
-void MixedInitiativeController::loaCallback(const std_msgs::Int8::ConstPtr& msg)
+void ControlDataLogger::loaCallback(const std_msgs::Int8::ConstPtr& msg)
 {
 
     switch (msg->data)
@@ -106,19 +106,19 @@ void MixedInitiativeController::loaCallback(const std_msgs::Int8::ConstPtr& msg)
 
 
 
-void MixedInitiativeController::robotVelCallback(const geometry_msgs::Twist::ConstPtr& msg)
+void ControlDataLogger::robotVelCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
     cmdvel_robot_ = *msg;
 
 }
 
-void MixedInitiativeController::robotVelOptimalCallback(const geometry_msgs::Twist::ConstPtr& msg)
+void ControlDataLogger::robotVelOptimalCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
     cmdvel_optimal_ = *msg;
 }
 
 // Where magic happens, it computes the cost, judging to switch LAO
-void MixedInitiativeController::computeCostCallback(const ros::TimerEvent&)
+void ControlDataLogger::computeCostCallback(const ros::TimerEvent&)
 { 
     vel_error_ = cmdvel_optimal_.linear.x - cmdvel_robot_.linear.x;
     vel_error_ = fabs(vel_error_);
@@ -161,7 +161,7 @@ void MixedInitiativeController::computeCostCallback(const ros::TimerEvent&)
 int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "mixed_initiative_controller");
-    MixedInitiativeController controller_obj;
+    ControlDataLogger controller_obj;
 
     ros::Rate r(10); // 10 hz
     while (ros::ok())
