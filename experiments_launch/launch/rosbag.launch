@@ -24,12 +24,12 @@
                 /tf
                 /tf_static
 		/trajectory	
-/cam_compress/image/compressed
-/cam_compress/image/compressed/parameter_descriptions
-/cam_compress/image/compressed/parameter_updates
+		/cam_compress/image/compressed
+		/cam_compress/image/compressed/parameter_descriptions
+ 		/cam_compress/image/compressed/parameter_updates
                 /control_mode
 		/noise_reset
-    /noise_active
+                /noise_active
 		/secondary_task/ended
 		/secondary_task/started
                 /experiment_started

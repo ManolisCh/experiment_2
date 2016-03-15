@@ -7,6 +7,7 @@
        args="-o /home/manolis/rosbags
 
                 /clock
+                /loa_has_changed
 	        /vel_error
 		/angular_error" />
 

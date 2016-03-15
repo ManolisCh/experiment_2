@@ -27,28 +27,36 @@ private:
     void robotCmdVelOptimalCallback(const geometry_msgs::Twist::ConstPtr& msg);
     void robotCmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg);
     void computeCostCallback(const ros::TimerEvent&);
+    void loaCallback(const std_msgs::Int8::ConstPtr& msg); // LAO topic
 
 
     double vel_error_, angular_error_ ;
+    int previous_loa_;
 
     std_msgs::Float64 linear_vel_error_msg_, angular_vel_error_msg_;
 
     ros::NodeHandle n_;
-    ros::Subscriber cmdvel_robot_sub_ , cmdvel_robot_optimal_sub_;
-    ros::Publisher vel_error_pub_, angluar_error_pub_;
+    ros::Subscriber cmdvel_robot_sub_ , cmdvel_robot_optimal_sub_, control_mode_sub_;
+    ros::Publisher vel_error_pub_, angluar_error_pub_, loa_changed_pub_;
     ros::Timer compute_cost_;
 
     geometry_msgs::Twist cmdvel_robot_, cmdvel_optimal_;
+    std_msgs::Bool loa_changed_msg_;
 
 };
 
 ControlDataLogger::ControlDataLogger()
 {
+
+    previous_loa_ = 0;
+
     cmdvel_robot_sub_ = n_.subscribe("/cmd_vel", 5 , &ControlDataLogger::robotCmdVelCallback, this); // current velocity of the robot.
     cmdvel_robot_optimal_sub_ = n_.subscribe("/cmd_vel_optimal", 5 , &ControlDataLogger::robotCmdVelOptimalCallback, this); // The optimal velocity e.g. perfect move_base
+    control_mode_sub_ = n_.subscribe("/control_mode", 5, &ControlDataLogger::loaCallback, this); // the LOA (from joystick)
 
     vel_error_pub_ = n_.advertise<std_msgs::Float64>("/vel_error", 1);
     angluar_error_pub_ = n_.advertise<std_msgs::Float64>("/angular_error", 1);
+    loa_changed_pub_ = n_.advertise<std_msgs::Bool>("/loa_has_changed", 1);
 
     // The ros Duration controls the period in sec. that the cost, error etc will be computed. currently 10hz
     compute_cost_ = n_.createTimer(ros::Duration(0.2), &ControlDataLogger::computeCostCallback, this);
@@ -65,6 +73,16 @@ void ControlDataLogger::robotCmdVelCallback(const geometry_msgs::Twist::ConstPtr
 void ControlDataLogger::robotCmdVelOptimalCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
     cmdvel_optimal_ = *msg;
+}
+
+void ControlDataLogger::loaCallback(const std_msgs::Int8::ConstPtr& msg)
+{
+    if (msg->data != previous_loa_)
+    {
+        previous_loa_ = msg->data;
+        loa_changed_msg_.data = true;
+        loa_changed_pub_.publish(loa_changed_msg_);
+    }
 }
 
 // it computes the cmd vel error
