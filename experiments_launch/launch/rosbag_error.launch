@@ -8,6 +8,8 @@
 
                 /clock
                 /loa_has_changed
+                /cmd_vel_optimal
+                /cmd_vel
 	        /vel_error
 		/angular_error" />
 
