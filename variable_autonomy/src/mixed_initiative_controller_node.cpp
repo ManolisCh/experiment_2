@@ -50,8 +50,8 @@ ControlDataLogger::ControlDataLogger()
 
     loa_change_.data = false;
     valid_loa_ = false;
-    a_ = 0.066; // smoothing factor between [0,1]
-    vel_error_threshold_ = 0.09;
+    a_ = 0.08; // smoothing factor between [0,1]
+    vel_error_threshold_ = 0.1;
 
     number_timesteps_ = 25; // # of time steps used to initialize average
     count_timesteps_ = 1; // counts the # of time steps used to initialize average

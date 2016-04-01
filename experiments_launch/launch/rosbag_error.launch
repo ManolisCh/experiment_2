@@ -10,7 +10,8 @@
                 /loa_has_changed
                 /cmd_vel_optimal
                 /cmd_vel
-	        /vel_error
+                /vector_vel_error
+	        /linear_vel_error
 		/angular_error" />
 
 </launch>
