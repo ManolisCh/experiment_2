@@ -25,7 +25,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
-## * Let MSG_DEP_SET be the set of packages whose message types you use in
+## * Let MSG_DEP_SET be the set of packfl::Engine* engine = new fl::Engine;ages whose message types you use in
 ##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
 ## * In the file package.xml:
 ##   * add a build_depend tag for "message_generation"
@@ -138,7 +138,7 @@ add_executable(control_data_logger_node src/control_data_logger_node.cpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(control_mixer_node ${catkin_LIBRARIES})
-target_link_libraries(mixed_initiative_controller_node ${catkin_LIBRARIES})
+target_link_libraries(mixed_initiative_controller_node ${catkin_LIBRARIES} fuzzylite)
 target_link_libraries(control_data_logger_node ${catkin_LIBRARIES})
 
 #############
