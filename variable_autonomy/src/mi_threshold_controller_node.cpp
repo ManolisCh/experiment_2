@@ -16,7 +16,6 @@
 #include "std_msgs/Float64.h"
 #include <actionlib_msgs/GoalID.h>
 
-#include <fl/Headers.h>
 
 class ControlDataLogger
 {
@@ -51,8 +50,8 @@ ControlDataLogger::ControlDataLogger()
 
     loa_change_.data = false;
     valid_loa_ = false;
-    a_ = 0.08; // smoothing factor between [0,1]
-    vel_error_threshold_ = 0.1;
+    a_ = 0.06; // smoothing factor between [0,1]
+    vel_error_threshold_ = 0.07;
 
     number_timesteps_ = 25; // # of time steps used to initialize average
     count_timesteps_ = 1; // counts the # of time steps used to initialize average
@@ -162,51 +161,7 @@ void ControlDataLogger::computeCostCallback(const ros::TimerEvent&)
 int main(int argc, char *argv[])
 {
 
-    // Fuzzylite stuff
 
-    fl::Engine* engine = new fl::Engine;
-    engine->setName("controller");
-
-    fl::InputVariable* inputVariable = new fl::InputVariable;
-    inputVariable->setEnabled(true);
-    inputVariable->setName("error");
-    inputVariable->setRange(0.000, 0.100);
-    inputVariable->addTerm(new fl::Trapezoid("small", -1.000, 0.000, 0.040, 0.060));
-    inputVariable->addTerm(new fl::Trapezoid("medium", 0.040, 0.070, 0.080, 0.090));
-    inputVariable->addTerm(new fl::Trapezoid("large", 0.080, 0.090, 0.100, 0.200));
-    engine->addInputVariable(inputVariable);
-
-    fl::OutputVariable* outputVariable = new fl::OutputVariable;
-    outputVariable->setEnabled(true);
-    outputVariable->setName("change_LOA");
-    outputVariable->setRange(-1.000, 1.000);
-    outputVariable->fuzzyOutput()->setAccumulation(new fl::Maximum);
-    outputVariable->setDefuzzifier(new fl::LargestOfMaximum(200));
-    outputVariable->setDefaultValue(fl::nan);
-    // outputVariable->setLockValidOutput(false);
-    //outputVariable->setLockOutputRange(true);
-    outputVariable->addTerm(new fl::Triangle("change", 0.000, 1.000, 1.000));
-    outputVariable->addTerm(new fl::Triangle("no_change", -1.000, -1.000, 0.000));
-    engine->addOutputVariable(outputVariable);
-
-    fl::RuleBlock* ruleBlock = new fl::RuleBlock;
-    ruleBlock->setEnabled(true);
-    ruleBlock->setName("");
-    ruleBlock->setConjunction(new fl::Minimum);
-    ruleBlock->setDisjunction(new fl::Maximum);
-    ruleBlock->setActivation(new fl::Minimum);
-    ruleBlock->addRule(fl::Rule::parse("if error is small then change_LOA is no_change", engine));
-    ruleBlock->addRule(fl::Rule::parse("if error is medium then change_LOA is no_change", engine));
-    ruleBlock->addRule(fl::Rule::parse("if error is large then change_LOA is change", engine));
-    engine->addRuleBlock(ruleBlock);
-
-
-    engine->setInputValue("error", 0);
-    engine->process();
-
-    FL_LOG("Power.output = " << fl::Op::str(engine->getOutputValue("change_LOA") ) );
-
-    //-------------------------------------------------------------------///
     ros::init(argc, argv, "mixed_initiative_controller");
     ControlDataLogger controller_obj;
 
