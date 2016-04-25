@@ -15,8 +15,8 @@
 <node pkg="mixed_initiative_teleop" type="mixed_initiative_teleop" name="mi_teleop" output="screen"/>
 
 <!-- cmd mixer for choosing autonomy mode or e.g. emergency stop if nav doesnt work good. (buttons for teleoperation - stop - autonomy mode) -->
-<!-- In xbox controller Y =  teleop , A = auto , B = stop (in any case) -->
-<node pkg="mixed_initiative_controller" type="mixed_initiative_controller" name="mi_controller" output="screen"/>
+<!-- In xbox controller Y =  teleop , A = auto , LB = stop (in any case) -->
+<node pkg="variable_autonomy" type="control_mixer_node" name="control_mixer" output="screen"/>
 
 <!-- tf transform -->
 <!-- args ="x y z qx qy qz frame_id child_frame_id period_in_ms" -->

@@ -1,19 +1,18 @@
 #Independent settings for the local planner's costmap. Detailed descriptions of these parameters can be found at http://www.ros.org/wiki/costmap_2d
 
-local_costmap:
+global_frame: odom
 
-  #Set the global and robot frames for the costmap
-  global_frame: /odom
-  robot_base_frame: base_link
+update_frequency: 5.0
+publish_frequency: 2.0
 
-  #Set the update and publish frequency of the costmap
-  update_frequency: 5.0
-  publish_frequency: 2.0
+static_map: false
+rolling_window: true
+width: 6.0
+height: 6.0
+resolution: 0.025
 
-  #We'll configure this costmap to be a rolling window... meaning it is always centered at the robot
-  static_map: false
-  rolling_window: true
-  width: 6.0
-  height: 6.0
-  resolution: 0.025
+
+plugins:
+  - {name: obstacles_laser,           type: "costmap_2d::ObstacleLayer"}
+  - {name: inflation,                 type: "costmap_2d::InflationLayer"}
 

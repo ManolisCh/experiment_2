@@ -31,15 +31,15 @@ private:
     void robotVelCallback(const geometry_msgs::Twist::ConstPtr& msg);
     void computeCostCallback(const ros::TimerEvent&);
 
-    int loa_, number_timesteps_ , count_timesteps_;
+    int loa_, number_timesteps_error_ , count_timesteps_error_, number_timesteps_vel_, count_timesteps_vel_;
     bool valid_loa_;
-    double error_sum_, error_average_, a_,vel_error_ , vel_error_threshold_, decision_;
+    double error_sum_, error_average_, velocity_sum_, vel_average_,  a_,vel_error_ , vel_error_threshold_, decision_;
     std_msgs::Bool loa_change_;
-    std_msgs::Float64 error_average_msg_;
+    std_msgs::Float64 error_average_msg_, vel_average_msg_;
 
     ros::NodeHandle n_;
     ros::Subscriber loa_sub_ ,vel_robot_sub_ , vel_robot_optimal_sub_;
-    ros::Publisher loa_pub_, loa_change_pub_, vel_error_pub_;
+    ros::Publisher loa_pub_, loa_change_pub_, vel_error_pub_, vel_average_pub_;
     ros::Timer compute_cost_;
 
     geometry_msgs::Twist cmdvel_robot_, cmdvel_for_robot_, cmdvel_optimal_;
@@ -54,14 +54,17 @@ ControlDataLogger::ControlDataLogger(fl::Engine* engine)
 
     loa_change_.data = false;
     valid_loa_ = false;
-    a_ = 0.06; // smoothing factor between [0,1]
+    a_ = 0.06; // smoothing factor [0,1]
     vel_error_threshold_ = 0;
 
-    number_timesteps_ = 25; // # of time steps used to initialize average
-    count_timesteps_ = 1; // counts the # of time steps used to initialize average
+    number_timesteps_error_ = 25; // # of time steps used to initialize average
+    count_timesteps_error_ = 1; // counts the # of time steps used to initialize average
+    number_timesteps_vel_ = 25;
+    count_timesteps_vel_ = 1;
 
     loa_change_pub_ = n_.advertise<std_msgs::Bool>("/loa_change", 1);
     vel_error_pub_ = n_.advertise<std_msgs::Float64>("/vel_error", 1);
+    vel_average_pub_ = n_.advertise<std_msgs::Float64>("/vel_average", 1);
 
     loa_sub_ = n_.subscribe("/control_mode", 5, &ControlDataLogger::loaCallback, this); // the current LOA
     vel_robot_sub_ = n_.subscribe("/cmd_vel", 5 , &ControlDataLogger::robotVelCallback, this); // current velocity of the robot.
@@ -129,28 +132,51 @@ void ControlDataLogger::computeCostCallback(const ros::TimerEvent&)
     vel_error_ = cmdvel_optimal_.linear.x - cmdvel_robot_.linear.x;
     vel_error_ = fabs(vel_error_);
 
-    // calculates the average used to initialize exponential moving average
-    if (count_timesteps_ <= number_timesteps_)
+    if (vel_error_ > 0.1)   //bounds error
+       {vel_error_ = 0.1; }
+
+    // calculates the moving average initialization for velocity
+    if (count_timesteps_vel_ <= number_timesteps_vel_)
+    {
+        velocity_sum_ += cmdvel_robot_.linear.x;
+        vel_average_ = velocity_sum_ / number_timesteps_vel_;
+        count_timesteps_vel_++;
+    }
+
+    // calculates exponential moving average for current velocity
+    else if (count_timesteps_vel_ > number_timesteps_vel_)
+    {
+        vel_average_ = a_ * cmdvel_robot_.linear.x + (1-a_) * vel_average_;
+        engine_->setInputValue("speed", vel_average_);
+    }
+
+    // calculates the average error used to initialize exponential moving average
+    if (count_timesteps_error_ <= number_timesteps_error_)
     {
         error_sum_ += vel_error_;
-        error_average_ = error_sum_ / number_timesteps_;
-        count_timesteps_++;
+        error_average_ = error_sum_ / number_timesteps_error_;
+        count_timesteps_error_++;
     }
-    // calculates  exponential moving average
-    else if (count_timesteps_ > number_timesteps_)
+
+
+    // calculates  exponential moving average for error
+    else if (count_timesteps_error_ > number_timesteps_error_)
     {
         error_average_ = a_ * vel_error_ + (1-a_) * error_average_;
         engine_->setInputValue("error", error_average_);
+        engine_->setInputValue("speed", cmdvel_robot_.linear.x);
         engine_->process();
         decision_ = engine_->getOutputValue("change_LOA");
-        FL_LOG("Power.output = " << fl::Op::str(engine_->getOutputValue("change_LOA") ) );
+        FL_LOG("error = " << fl::Op::str(error_average_) );
+        FL_LOG("speed = " << fl::Op::str(cmdvel_robot_.linear.x) ) ;
+        FL_LOG("Decision = " << fl::Op::str(engine_->getOutputValue("change_LOA") ) );
 
 
         if ( (decision_ > vel_error_threshold_) && (loa_change_.data == false) )
         {
             loa_change_.data = true;
             loa_change_pub_.publish(loa_change_);
-            count_timesteps_ = 1; // enables re-initializaion of moving average by reseting count
+            count_timesteps_error_ = 1; // enables re-initializaion of moving average by reseting count
             loa_change_.data = false; // resets loa_change flag
             error_sum_ = 0; // resets sumation of errors for initial estimate
             ros::Duration(10).sleep();
@@ -166,6 +192,9 @@ void ControlDataLogger::computeCostCallback(const ros::TimerEvent&)
     error_average_msg_.data = error_average_;
     vel_error_pub_.publish(error_average_msg_);
 
+    vel_average_msg_.data = vel_average_;
+    vel_average_pub_.publish(vel_average_msg_);
+
 }
 
 
@@ -177,14 +206,23 @@ int main(int argc, char *argv[])
     fl::Engine* engine = new fl::Engine;
     engine->setName("controller");
 
-    fl::InputVariable* inputVariable = new fl::InputVariable;
-    inputVariable->setEnabled(true);
-    inputVariable->setName("error");
-    inputVariable->setRange(0.000, 0.100);
-    inputVariable->addTerm(new fl::Trapezoid("small", -1.000, 0.000, 0.040, 0.060));
-    inputVariable->addTerm(new fl::Trapezoid("medium", 0.040, 0.070, 0.080, 0.090));
-    inputVariable->addTerm(new fl::Trapezoid("large", 0.080, 0.090, 0.100, 0.200));
-    engine->addInputVariable(inputVariable);
+    fl::InputVariable* inputVariable1 = new fl::InputVariable;
+    inputVariable1->setEnabled(true);
+    inputVariable1->setName("error");
+    inputVariable1->setRange(0.000, 0.100);
+    inputVariable1->addTerm(new fl::Trapezoid("small", 0.000, 0.000, 0.035, 0.060));
+    inputVariable1->addTerm(new fl::Trapezoid("medium", 0.045, 0.055, 0.065, 0.080));
+    inputVariable1->addTerm(new fl::Trapezoid("large", 0.065, 0.085, 0.100, 0.100));
+    engine->addInputVariable(inputVariable1);
+
+    fl::InputVariable* inputVariable2 = new fl::InputVariable;
+    inputVariable2->setEnabled(true);
+    inputVariable2->setName("speed");
+    inputVariable2->setRange(-0.400, 0.400);
+    inputVariable2->addTerm(new fl::Trapezoid("reverse", -0.400, -0.400, -0.030, -0.020));
+    inputVariable2->addTerm(new fl::Triangle("zero", -0.030, 0.000, 0.030));
+    inputVariable2->addTerm(new fl::Trapezoid("forward", 0.020, 0.030, 0.400, 0.400));
+    engine->addInputVariable(inputVariable2);
 
     fl::OutputVariable* outputVariable = new fl::OutputVariable;
     outputVariable->setEnabled(true);
@@ -193,8 +231,7 @@ int main(int argc, char *argv[])
     outputVariable->fuzzyOutput()->setAccumulation(new fl::Maximum);
     outputVariable->setDefuzzifier(new fl::LargestOfMaximum(200));
     outputVariable->setDefaultValue(fl::nan);
-    // outputVariable->setLockValidOutput(false);
-    //outputVariable->setLockOutputRange(true);
+
     outputVariable->addTerm(new fl::Triangle("change", 0.000, 1.000, 1.000));
     outputVariable->addTerm(new fl::Triangle("no_change", -1.000, -1.000, 0.000));
     engine->addOutputVariable(outputVariable);
@@ -205,10 +242,14 @@ int main(int argc, char *argv[])
     ruleBlock->setConjunction(new fl::Minimum);
     ruleBlock->setDisjunction(new fl::Maximum);
     ruleBlock->setActivation(new fl::Minimum);
-    ruleBlock->addRule(fl::Rule::parse("if error is small then change_LOA is no_change", engine));
-    ruleBlock->addRule(fl::Rule::parse("if error is medium then change_LOA is no_change", engine));
-    ruleBlock->addRule(fl::Rule::parse("if error is large then change_LOA is change", engine));
+    ruleBlock->addRule(fl::Rule::parse("if error is small or error is medium then change_LOA is no_change", engine));
+    ruleBlock->addRule(fl::Rule::parse("if error is large and speed is not reverse then change_LOA is change", engine));
+    ruleBlock->addRule(fl::Rule::parse("if speed is reverse and error is large then change_LOA is no_change", engine));
     engine->addRuleBlock(ruleBlock);
+
+
+
+
 
     //-------------------------------------------------------------------///
 

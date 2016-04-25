@@ -15,7 +15,6 @@
 #include "std_msgs/Bool.h"
 #include "std_msgs/Int8.h"
 #include <actionlib_msgs/GoalID.h>
-//#include <sound_play/sound_play.h>
 
 
 class ControlMixer
@@ -40,7 +39,7 @@ private:
     geometry_msgs::Twist cmdvel_for_robot_;
     actionlib_msgs::GoalID cancelGoal_;
     std_msgs::Int8 loa_msg_;
-    //sound_play::SoundClient sound_client_ ;
+
 };
 
 ControlMixer::ControlMixer()
@@ -73,7 +72,6 @@ void ControlMixer::loaCallback(const std_msgs::Int8::ConstPtr& msg)
         loa_ = 0;
         valid_loa_ = true;
         ROS_INFO("Stop robot");
-        //sound_client_.say("stoped!");
         break;
     }
     case 1:
@@ -84,7 +82,6 @@ void ControlMixer::loaCallback(const std_msgs::Int8::ConstPtr& msg)
         cmdvel_for_robot_.angular.z = 0;
         vel_for_robot_pub_.publish(cmdvel_for_robot_); // solves bug in which last auto msg if propagated in teleop
         ROS_INFO("Control mode: Teleoperation");
-       // sound_client_.say("teleoperation!");
         break;
     }
     case 2:
@@ -95,7 +92,6 @@ void ControlMixer::loaCallback(const std_msgs::Int8::ConstPtr& msg)
         cmdvel_for_robot_.angular.z = 0;
         vel_for_robot_pub_.publish(cmdvel_for_robot_); // solves bug in which last teleop msg if propagated in auto
         ROS_INFO("Control mode: Autonomy");
-       // sound_client_.say("autonomy!");
         break;
     }
     default:
@@ -157,7 +153,6 @@ void ControlMixer::miCommandCallback(const std_msgs::Bool::ConstPtr& msg)
         cmdvel_for_robot_.linear.x = 0;
         cmdvel_for_robot_.angular.z = 0;
         vel_for_robot_pub_.publish(cmdvel_for_robot_); // solves bug in which last auto msg if propagated in teleop
-        //sound_client_.playWaveFromPkg("variable_autonomy","auto_pilot.wav");
 
     }
     else if (msg->data == true && loa_ == 2)
@@ -167,8 +162,6 @@ void ControlMixer::miCommandCallback(const std_msgs::Bool::ConstPtr& msg)
         cmdvel_for_robot_.linear.x = 0;
         cmdvel_for_robot_.angular.z = 0;
         vel_for_robot_pub_.publish(cmdvel_for_robot_); // solves bug in which last auto msg if propagated in teleop
-        //sound_client_.playWaveFromPkg("variable_autonomy","auto_pilot.wav");
-
     }
     else if (msg->data == true && loa_ == 0)
     {

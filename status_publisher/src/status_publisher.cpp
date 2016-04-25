@@ -18,11 +18,11 @@
 
 
 
-class StatusPublisher
+class StatusSoundPublisher
 {
 public:
 
-    StatusPublisher();
+    StatusSoundPublisher();
 
 
 private:
@@ -52,7 +52,7 @@ private:
 
 
 // Constractor
-StatusPublisher::StatusPublisher(): it_(nh_)
+StatusSoundPublisher::StatusSoundPublisher(): it_(nh_)
 {
 
     // Initialise status/result values
@@ -63,20 +63,20 @@ StatusPublisher::StatusPublisher(): it_(nh_)
 
 
     // Subscribers
-    mode_sub_ = nh_.subscribe<std_msgs::Int8>("/control_mode", 1 , &StatusPublisher::modeCallBack, this);
+    mode_sub_ = nh_.subscribe<std_msgs::Int8>("/control_mode", 1 , &StatusSoundPublisher::modeCallBack, this);
     navStatus_sub_  = nh_.subscribe<actionlib_msgs::GoalStatusArray>("/move_base/status", 1,
-                                                                     &StatusPublisher::navStatusCallBack, this);
+                                                                     &StatusSoundPublisher::navStatusCallBack, this);
     navResult_sub_ = nh_.subscribe<move_base_msgs::MoveBaseActionResult>("/move_base/result", 1,
-                                                                         &StatusPublisher::navResultCallBack,this);
+                                                                         &StatusSoundPublisher::navResultCallBack,this);
     explStatus_sub_ = nh_.subscribe<actionlib_msgs::GoalStatusArray>("/explore_server/status",1,
-                                                                     &StatusPublisher::explStatusCallback, this);
+                                                                     &StatusSoundPublisher::explStatusCallback, this);
     explResult_sub_ = nh_.subscribe<frontier_exploration::ExploreTaskActionResult>("/explore_server/result", 1,
-                                                                                   &StatusPublisher::explResultCallback,this);
+                                                                                   &StatusSoundPublisher::explResultCallback,this);
 
     // publishers
     mode_pub_ = it_.advertise("/robot_status/mode", 1, true);
     navStatus_pub_ = it_.advertise("/robot_status/nav",1, true);
-    timerPubStatus_ = nh_.createTimer(ros::Duration(0.100), &StatusPublisher::timerPubStatusCallback, this);
+    timerPubStatus_ = nh_.createTimer(ros::Duration(0.100), &StatusSoundPublisher::timerPubStatusCallback, this);
 
     // Path where the images are
     pathTeleop_ = ros::package::getPath("status_publisher");
@@ -192,7 +192,7 @@ StatusPublisher::StatusPublisher(): it_(nh_)
 
 
 // takes care of MODE
-void StatusPublisher::modeCallBack(const std_msgs::Int8::ConstPtr& mode)
+void StatusSoundPublisher::modeCallBack(const std_msgs::Int8::ConstPtr& mode)
 {
     if (mode->data == 0)
         mode_pub_.publish(rosImgStop_);
@@ -205,7 +205,7 @@ void StatusPublisher::modeCallBack(const std_msgs::Int8::ConstPtr& mode)
 
 
 // takes care of EXPLORATION current STATUS
-void StatusPublisher::explStatusCallback(const actionlib_msgs::GoalStatusArray::ConstPtr& explStatus)
+void StatusSoundPublisher::explStatusCallback(const actionlib_msgs::GoalStatusArray::ConstPtr& explStatus)
 
 {
 
@@ -228,7 +228,7 @@ void StatusPublisher::explStatusCallback(const actionlib_msgs::GoalStatusArray::
 
 // takes care of EXPLORATION end Result
 
-void StatusPublisher::explResultCallback(const frontier_exploration::ExploreTaskActionResult::ConstPtr& explResult)
+void StatusSoundPublisher::explResultCallback(const frontier_exploration::ExploreTaskActionResult::ConstPtr& explResult)
 {
     explResult_ = explResult->status.status;
 }
@@ -236,7 +236,7 @@ void StatusPublisher::explResultCallback(const frontier_exploration::ExploreTask
 
 
 // takes care of NAVIGATION current STATUS
-void StatusPublisher::navStatusCallBack(const actionlib_msgs::GoalStatusArray::ConstPtr& navStatus)
+void StatusSoundPublisher::navStatusCallBack(const actionlib_msgs::GoalStatusArray::ConstPtr& navStatus)
 {
     if (!navStatus->status_list.empty()) //First make you the vector is not empty to avoid memory allocation errors.
     {
@@ -257,14 +257,14 @@ void StatusPublisher::navStatusCallBack(const actionlib_msgs::GoalStatusArray::C
 
 
 // takes care of NAVIGATION end Result
-void StatusPublisher::navResultCallBack(const move_base_msgs::MoveBaseActionResult::ConstPtr& navResult)
+void StatusSoundPublisher::navResultCallBack(const move_base_msgs::MoveBaseActionResult::ConstPtr& navResult)
 {
     navResult_ = navResult->status.status;
 }
 
 
 // The timer function that fuses everyting and publishes to the interface
-void StatusPublisher::timerPubStatusCallback(const ros::TimerEvent&)
+void StatusSoundPublisher::timerPubStatusCallback(const ros::TimerEvent&)
 {
     // Publish current/running state
     if (navStatus_ == 1 && explStatus_ != 1)
@@ -323,7 +323,7 @@ int main(int argc, char** argv)
 
     ros::init(argc, argv, "status_publisher");
 
-    StatusPublisher publishStatus;
+    StatusSoundPublisher publishStatus;
 
 
     ros::Rate loop_rate(10);
