@@ -57,9 +57,9 @@ ControlDataLogger::ControlDataLogger(fl::Engine* engine)
     a_ = 0.06; // smoothing factor [0,1]
     vel_error_threshold_ = 0;
 
-    number_timesteps_error_ = 25; // # of time steps used to initialize average
+    number_timesteps_error_ = 16; // # of time steps used to initialize average
     count_timesteps_error_ = 1; // counts the # of time steps used to initialize average
-    number_timesteps_vel_ = 25;
+    number_timesteps_vel_ = 16;
     count_timesteps_vel_ = 1;
 
     loa_change_pub_ = n_.advertise<std_msgs::Bool>("/loa_change", 1);
