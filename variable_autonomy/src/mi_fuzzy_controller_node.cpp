@@ -31,15 +31,16 @@ private:
     void robotVelCallback(const geometry_msgs::Twist::ConstPtr& msg);
     void computeCostCallback(const ros::TimerEvent&);
 
-    int loa_, number_timesteps_error_ , count_timesteps_error_, number_timesteps_vel_, count_timesteps_vel_;
+    int loa_, number_timesteps_error_ , count_timesteps_error_, number_timesteps_vel_, count_timesteps_vel_, previous_loa_  ;
     bool valid_loa_;
-    double error_sum_, error_average_, velocity_sum_, vel_average_,  a_,vel_error_ , vel_error_threshold_, decision_;
-    std_msgs::Bool loa_change_;
+    double error_sum_, error_average_, velocity_sum_, vel_error_average_,  a_,vel_error_ , vel_error_threshold_, decision_;
+    std_msgs::Bool loa_change_, loa_changed_msg_;
     std_msgs::Float64 error_average_msg_, vel_average_msg_;
+    std_msgs::Int8 ai_switch_count_msg_;
 
     ros::NodeHandle n_;
     ros::Subscriber loa_sub_ ,vel_robot_sub_ , vel_robot_optimal_sub_;
-    ros::Publisher loa_pub_, loa_change_pub_, vel_error_pub_, vel_average_pub_;
+    ros::Publisher loa_pub_, loa_change_pub_, vel_error_pub_, vel_error_average_pub_, ai_switch_count_pub_, loa_changed_pub_;
     ros::Timer compute_cost_;
 
     geometry_msgs::Twist cmdvel_robot_, cmdvel_for_robot_, cmdvel_optimal_;
@@ -61,10 +62,14 @@ ControlDataLogger::ControlDataLogger(fl::Engine* engine)
     count_timesteps_error_ = 1; // counts the # of time steps used to initialize average
     number_timesteps_vel_ = 16;
     count_timesteps_vel_ = 1;
+    ai_switch_count_msg_.data = 0;
+    previous_loa_ = 0;
 
     loa_change_pub_ = n_.advertise<std_msgs::Bool>("/loa_change", 1);
     vel_error_pub_ = n_.advertise<std_msgs::Float64>("/vel_error", 1);
-    vel_average_pub_ = n_.advertise<std_msgs::Float64>("/vel_average", 1);
+    vel_error_average_pub_ = n_.advertise<std_msgs::Float64>("/vel_error_average", 1);
+    ai_switch_count_pub_ = n_.advertise<std_msgs::Int8>("/ai_switch_count", 1);
+    loa_changed_pub_ = n_.advertise<std_msgs::Bool>("/loa_has_changed", 1);
 
     loa_sub_ = n_.subscribe("/control_mode", 5, &ControlDataLogger::loaCallback, this); // the current LOA
     vel_robot_sub_ = n_.subscribe("/cmd_vel", 5 , &ControlDataLogger::robotVelCallback, this); // current velocity of the robot.
@@ -110,6 +115,14 @@ void ControlDataLogger::loaCallback(const std_msgs::Int8::ConstPtr& msg)
         ROS_INFO("Please choose a valid control mode.");
     }
     }
+
+    if (msg->data != previous_loa_)
+    {
+        previous_loa_ = msg->data;
+        loa_changed_msg_.data = true;
+        loa_changed_pub_.publish(loa_changed_msg_);
+    }
+
 }
 
 
@@ -133,21 +146,21 @@ void ControlDataLogger::computeCostCallback(const ros::TimerEvent&)
     vel_error_ = fabs(vel_error_);
 
     if (vel_error_ > 0.1)   //bounds error
-       {vel_error_ = 0.1; }
+    {vel_error_ = 0.1; }
 
     // calculates the moving average initialization for velocity
     if (count_timesteps_vel_ <= number_timesteps_vel_)
     {
         velocity_sum_ += cmdvel_robot_.linear.x;
-        vel_average_ = velocity_sum_ / number_timesteps_vel_;
+        vel_error_average_ = velocity_sum_ / number_timesteps_vel_;
         count_timesteps_vel_++;
     }
 
     // calculates exponential moving average for current velocity
     else if (count_timesteps_vel_ > number_timesteps_vel_)
     {
-        vel_average_ = a_ * cmdvel_robot_.linear.x + (1-a_) * vel_average_;
-        engine_->setInputValue("speed", vel_average_);
+        vel_error_average_ = a_ * cmdvel_robot_.linear.x + (1-a_) * vel_error_average_;
+        engine_->setInputValue("speed", vel_error_average_);
     }
 
     // calculates the average error used to initialize exponential moving average
@@ -176,6 +189,10 @@ void ControlDataLogger::computeCostCallback(const ros::TimerEvent&)
         {
             loa_change_.data = true;
             loa_change_pub_.publish(loa_change_);
+
+            ai_switch_count_msg_.data++ ;
+            ai_switch_count_pub_.publish(ai_switch_count_msg_);
+
             count_timesteps_error_ = 1; // enables re-initializaion of moving average by reseting count
             loa_change_.data = false; // resets loa_change flag
             error_sum_ = 0; // resets sumation of errors for initial estimate
@@ -192,8 +209,8 @@ void ControlDataLogger::computeCostCallback(const ros::TimerEvent&)
     error_average_msg_.data = error_average_;
     vel_error_pub_.publish(error_average_msg_);
 
-    vel_average_msg_.data = vel_average_;
-    vel_average_pub_.publish(vel_average_msg_);
+    vel_average_msg_.data = vel_error_average_;
+    vel_error_average_pub_.publish(vel_average_msg_);
 
 }
 
